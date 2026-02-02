@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Operating System Notes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{
+    box-sizing: border-box;
+}
+
+body{
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #0f172a;
+}
+
+/* ================= HEADER ================= */
+header{
+    height: 56px;
+    background: linear-gradient(to right, #2563eb, #38bdf8);
+    color: white;
+    padding: 0 14px;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.back-btn{
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.back-btn:hover{
+    color: #c7d2fe;
+}
+
+.units-btn{
+    background: #020617;
+    color: white;
+    border: none;
+    padding: 7px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.units-btn:hover{
+    background: #93c5fd;
+    color: black;
+}
+
+/* ================= MAIN ================= */
+.main{
+    display: flex;
+    height: calc(100vh - 56px);
+}
+
+/* ================= SIDEBAR ================= */
+.sidebar{
+    width: 240px;
+    background: #020617;
+    padding: 15px;
+    transition: width 0.3s ease;
+}
+
+.sidebar.hidden{
+    width: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.sidebar button{
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 8px;
+    background: #1e293b;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.sidebar button:hover{
+    background: #93c5fd;
+    color: black;
+}
+
+/* ================= CONTENT ================= */
+.content{
+    flex: 1;
+    background: white;
+}
+
+iframe{
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header>
+    <button class="back-btn" onclick="goBack()">⟵</button>
+    <button class="units-btn" onclick="toggleSidebar()">☰ Units</button>
+    <strong>📘 Operating System Notes</strong>
+</header>
+
+<!-- MAIN -->
+<div class="main">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <button onclick="loadUnit('os_unit1.html')">Unit 1 – Introduction</button>
+        <button onclick="loadUnit('osunit2.html')">Unit 2 – Process</button>
+        <button onclick="loadUnit('os_unit3.html')">Unit 3 – Memory</button>
+        <button onclick="loadUnit('os_unit4.html')">Unit 4 – File System</button>
+        <button onclick="loadUnit('os_unit5.html')">Unit 5 – I/O</button>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+        <iframe id="viewer" src="os_unit1.html"></iframe>
+    </div>
+
+</div>
+
+<script>
+function loadUnit(file){
+    document.getElementById("viewer").src = file;
+}
+
+function toggleSidebar(){
+    document.getElementById("sidebar").classList.toggle("hidden");
+}
+
+function goBack(){
+    window.location.href = "../index.html";
+}
+</script>
+
+</body>
+</html>
