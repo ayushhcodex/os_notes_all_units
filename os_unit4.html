@@ -1,0 +1,1725 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operating System – Unit 4 | Memory Management | AKTU B.Tech CSE</title>
+    <style>
+        /* Fixed Home Button */
+.home-btn{
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    padding: 8px 14px;
+    background: #1e293b;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    z-index: 10000;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+
+.home-btn:hover{
+    background: #0f172a;
+}
+
+/* Smooth scroll */
+html{
+    scroll-behavior: smooth;
+}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #2c3e50;
+            padding: 20px;
+            position: relative;
+        }
+
+         body::after {
+            content: "operating system Unit 4 • aktunotes.live";
+            position: fixed;
+            top: 40%;
+            left: 5%;
+            font-size: 28px;
+            color: rgba(0,0,0,0.05);
+            transform: rotate(-30deg);
+            pointer-events: none;
+            z-index: 9999;
+            width: 100%;
+            text-align: center;
+        }
+
+        @media print {
+            body {
+                display: none !important; 
+            }
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+
+        nav {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        nav h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        nav ul {
+            list-style: none;
+            columns: 2;
+            column-gap: 30px;
+        }
+
+        nav ul li {
+            margin: 10px 0;
+            break-inside: avoid;
+        }
+
+        nav ul li a {
+            color: #764ba2;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: block;
+            padding: 8px 12px;
+            border-radius: 5px;
+        }
+
+        nav ul li a:hover {
+            background: #f0f0f0;
+            color: #667eea;
+            transform: translateX(5px);
+        }
+
+        main {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        section {
+            margin-bottom: 50px;
+        }
+
+        section h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        section h3 {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        section h4 {
+            color: #555;
+            font-size: 1.2em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .definition {
+            background: #e8f4f8;
+            border-left: 5px solid #667eea;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+
+        .important {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .note {
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        table th, table td {
+            padding: 15px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        table tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        table tbody tr:hover {
+            background: #e8f4f8;
+        }
+
+        ul, ol {
+            margin: 15px 0 15px 40px;
+        }
+
+        ul li, ol li {
+            margin: 8px 0;
+        }
+
+        .exam-focus {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 40px;
+        }
+
+        .exam-focus h2 {
+            color: white;
+            border-bottom: 3px solid white;
+        }
+
+        .exam-focus h3 {
+            color: #fff3cd;
+            margin-top: 20px;
+        }
+
+        .exam-focus ul {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .exam-focus ul li::before {
+            content: "✓ ";
+            color: #fff3cd;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            main {
+                padding: 20px;
+            }
+
+            nav ul {
+                columns: 1;
+            }
+
+            body::after {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body id="top">
+   <a href="#top" class="home-btn">↑</a>
+    <header>
+        <h1>Operating System – Unit 4</h1>
+        <p>Memory Management | AKTU B.Tech CSE – Exam Oriented Notes</p>
+    </header>
+
+    <nav>
+        <h2>Table of Contents</h2>
+        <ul>
+            <li><a href="#intro">Introduction to Memory Management</a></li>
+            <li><a href="#address-binding">Address Binding</a></li>
+            <li><a href="#allocation">Memory Allocation Techniques</a></li>
+            <li><a href="#paging">Paging</a></li>
+            <li><a href="#segmentation">Segmentation</a></li>
+            <li><a href="#comparison">Paging vs Segmentation</a></li>
+            <li><a href="#virtual-memory">Virtual Memory</a></li>
+            <li><a href="#page-replacement">Page Replacement Algorithms</a></li>
+            <li><a href="#thrashing">Thrashing</a></li>
+            <li><a href="#exam">Exam Focus Box</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="intro">
+            <h2>1. Introduction to Memory Management</h2>
+
+            <div class="definition">
+                Memory management is the functionality of an operating system that handles and manages primary memory (RAM). It keeps track of each memory location, allocates memory to processes when needed, and deallocates memory when processes are terminated.
+            </div>
+
+            <h3>Definition of Memory Management</h3>
+            <p>Memory management refers to the process of controlling and coordinating computer memory, assigning portions called blocks to various running programs to optimize overall system performance. The operating system performs memory management to track the status of each memory location, whether allocated or free, and makes decisions about which processes to load into memory when memory space becomes available.</p>
+
+            <h3>Goals of Memory Management</h3>
+            <p>The primary objectives of memory management in an operating system are:</p>
+
+            <h4>1. Allocation and Deallocation</h4>
+            <p>The operating system must efficiently allocate memory to processes when they need it and deallocate memory when processes terminate or no longer require it. This ensures optimal utilization of available memory resources.</p>
+
+            <h4>2. Protection and Isolation</h4>
+            <p>Memory management ensures that each process operates in its own memory space and cannot access or modify the memory of other processes. This prevents interference between processes and maintains system stability and security.</p>
+
+            <h4>3. Relocation</h4>
+            <p>The system should be able to move processes in memory during execution. A process should be able to run in different memory locations at different times, providing flexibility in memory allocation.</p>
+
+            <h4>4. Sharing</h4>
+            <p>Memory management should allow controlled sharing of memory between processes when necessary, such as when multiple processes need access to the same code or data libraries.</p>
+
+            <h4>5. Logical Organization</h4>
+            <p>Programs are typically organized into modules that can be written and compiled independently. Memory management should support this modular structure efficiently.</p>
+
+            <h4>6. Physical Organization</h4>
+            <p>Memory is organized into two levels: main memory (fast, expensive, volatile) and secondary storage (slow, cheap, non-volatile). Memory management handles the flow of information between these two levels.</p>
+
+            <h4>7. Maximum Utilization</h4>
+            <p>The system should maximize memory utilization by minimizing wasted space and ensuring that as much memory as possible is being used productively by running processes.</p>
+
+            <h3>Role of Operating System in Memory Management</h3>
+            <p>The operating system plays a crucial role in managing memory through the following functions:</p>
+
+            <ul>
+                <li><strong>Memory Allocation:</strong> Deciding which process gets memory space, how much space is allocated, and when it is allocated</li>
+                <li><strong>Memory Tracking:</strong> Keeping track of which parts of memory are currently being used and by which processes</li>
+                <li><strong>Memory Deallocation:</strong> Freeing up memory space when processes complete execution or no longer need certain memory areas</li>
+                <li><strong>Address Translation:</strong> Converting logical addresses used by processes into physical addresses in actual memory</li>
+                <li><strong>Memory Protection:</strong> Preventing processes from accessing memory locations that don't belong to them</li>
+                <li><strong>Memory Sharing:</strong> Allowing multiple processes to share memory when appropriate, such as for shared libraries</li>
+                <li><strong>Virtual Memory Management:</strong> Managing the illusion that each process has more memory available than physically exists</li>
+                <li><strong>Swapping:</strong> Moving processes between main memory and secondary storage to optimize memory usage</li>
+            </ul>
+
+            <div class="important">
+                <strong>Key Point for Exams:</strong> Memory management is essential for multiprogramming systems where multiple processes share the same physical memory. Without proper memory management, system performance would degrade significantly and processes could interfere with each other.
+            </div>
+        </section>
+
+        <section id="address-binding">
+            <h2>2. Address Binding</h2>
+
+            <div class="definition">
+                Address binding is the process of mapping program instructions and data to actual physical memory addresses. It is the association of program addresses to actual memory locations.
+            </div>
+
+            <h3>Logical Address vs Physical Address</h3>
+
+            <h4>Logical Address (Virtual Address)</h4>
+            <div class="definition">
+                A logical address is the address generated by the CPU during program execution. It is also called a virtual address. This is the address referenced by the program and does not represent the actual location in physical memory.
+            </div>
+
+            <p>Characteristics of logical address:</p>
+            <ul>
+                <li>Generated by the CPU while a program is executing</li>
+                <li>Used as a reference to access the physical memory location</li>
+                <li>Does not physically exist in memory</li>
+                <li>The set of all logical addresses is called the logical address space</li>
+                <li>Visible to the user and programmer</li>
+            </ul>
+
+            <h4>Physical Address</h4>
+            <div class="definition">
+                A physical address is the actual address in the main memory (RAM). It represents the real location in the memory unit where data is stored.
+            </div>
+
+            <p>Characteristics of physical address:</p>
+            <ul>
+                <li>Corresponds to actual location in physical memory</li>
+                <li>Computed by the Memory Management Unit (MMU)</li>
+                <li>Not directly visible to the user program</li>
+                <li>The set of all physical addresses is called the physical address space</li>
+                <li>Used by the memory hardware to access data</li>
+            </ul>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Logical Address</th>
+                        <th>Physical Address</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Also Known As</td>
+                        <td>Virtual Address</td>
+                        <td>Real Address</td>
+                    </tr>
+                    <tr>
+                        <td>Generated By</td>
+                        <td>CPU</td>
+                        <td>MMU (Memory Management Unit)</td>
+                    </tr>
+                    <tr>
+                        <td>Visibility</td>
+                        <td>Visible to user</td>
+                        <td>Not visible to user</td>
+                    </tr>
+                    <tr>
+                        <td>Address Space</td>
+                        <td>Logical address space</td>
+                        <td>Physical address space</td>
+                    </tr>
+                    <tr>
+                        <td>Access</td>
+                        <td>User can access and modify</td>
+                        <td>User cannot directly access</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Types of Address Binding</h3>
+            <p>Address binding can occur at three different stages:</p>
+
+            <h4>1. Compile-Time Binding</h4>
+            <div class="definition">
+                In compile-time binding, if the memory location of a process is known at compile time, then absolute code can be generated. The compiler binds the logical addresses directly to physical addresses.
+            </div>
+
+            <p>Characteristics:</p>
+            <ul>
+                <li>Physical addresses are generated at compile time</li>
+                <li>Logical and physical addresses are the same</li>
+                <li>Process must be loaded at the predetermined memory location</li>
+                <li>If the starting location changes, the code must be recompiled</li>
+                <li>Not flexible and rarely used in modern systems</li>
+                <li>Suitable for embedded systems with fixed memory allocation</li>
+            </ul>
+
+            <div class="note">
+                <strong>Example:</strong> If a compiler knows that a process will begin at location 1000, it generates code that starts at that absolute address. The process cannot be relocated to a different address without recompilation.
+            </div>
+
+            <h4>2. Load-Time Binding</h4>
+            <div class="definition">
+                In load-time binding, if the memory location is not known at compile time, the compiler generates relocatable code. The binding of logical addresses to physical addresses is delayed until load time.
+            </div>
+
+            <p>Characteristics:</p>
+            <ul>
+                <li>Physical addresses are generated when the program is loaded into memory</li>
+                <li>Compiler generates relocatable code</li>
+                <li>Loader is responsible for binding logical addresses to physical addresses</li>
+                <li>If starting address changes, only need to reload, not recompile</li>
+                <li>More flexible than compile-time binding</li>
+                <li>Once loaded, the process cannot be moved to a different location</li>
+            </ul>
+
+            <div class="note">
+                <strong>Example:</strong> A compiler generates code with addresses starting from 0. When loaded, if the loader places the process at location 5000, it adds 5000 to all addresses in the program.
+            </div>
+
+            <h4>3. Execution-Time Binding (Dynamic Binding)</h4>
+            <div class="definition">
+                In execution-time binding, the binding of logical addresses to physical addresses is delayed until the instruction is actually executed. The process can be moved from one memory location to another during execution.
+            </div>
+
+            <p>Characteristics:</p>
+            <ul>
+                <li>Physical addresses are generated during program execution</li>
+                <li>Requires hardware support from Memory Management Unit (MMU)</li>
+                <li>Process can be moved in memory during execution</li>
+                <li>Logical and physical addresses are different</li>
+                <li>Most flexible binding scheme</li>
+                <li>Used by most modern operating systems</li>
+                <li>Enables virtual memory implementation</li>
+            </ul>
+
+            <div class="note">
+                <strong>Example:</strong> A process may start at location 3000, but during execution, it can be moved to location 8000. The MMU dynamically translates addresses, so the program continues to work correctly.
+            </div>
+
+            <h3>Memory Management Unit (MMU)</h3>
+            <div class="definition">
+                The Memory Management Unit (MMU) is a hardware component that handles the translation of logical addresses to physical addresses at runtime. It acts as an intermediary between the CPU and physical memory.
+            </div>
+
+            <p>Functions of MMU:</p>
+            <ul>
+                <li>Performs address translation from logical to physical addresses</li>
+                <li>Implements memory protection mechanisms</li>
+                <li>Handles page faults in virtual memory systems</li>
+                <li>Manages cache memory operations</li>
+                <li>Provides hardware support for paging and segmentation</li>
+            </ul>
+
+            <div class="important">
+                <strong>Remember for Exams:</strong> Execution-time binding is the most commonly used in modern operating systems because it provides maximum flexibility and enables features like virtual memory and dynamic memory allocation.
+            </div>
+        </section>
+
+        <section id="allocation">
+            <h2>3. Memory Allocation Techniques</h2>
+
+            <h3>Contiguous Memory Allocation</h3>
+            <div class="definition">
+                Contiguous memory allocation is a memory allocation technique where each process is allocated a single contiguous block of memory. The entire process resides in one continuous section of memory.
+            </div>
+
+            <p>In contiguous allocation, the main memory is divided into partitions, and each partition contains exactly one process. There are two main approaches to contiguous memory allocation:</p>
+
+            <h3>1. Fixed Partitioning (Static Partitioning)</h3>
+
+            <div class="definition">
+                Fixed partitioning divides the memory into fixed-size partitions at system initialization. Each partition can hold exactly one process. The partition size is predetermined and does not change during system operation.
+            </div>
+
+            <h4>Characteristics of Fixed Partitioning</h4>
+            <ul>
+                <li>Memory is divided into fixed-size partitions during system setup</li>
+                <li>Partitions may be of equal size or different sizes</li>
+                <li>Each partition can accommodate exactly one process</li>
+                <li>Number of partitions determines the degree of multiprogramming</li>
+                <li>Simple to implement and manage</li>
+                <li>Partition sizes remain constant throughout system operation</li>
+            </ul>
+
+            <h4>Advantages of Fixed Partitioning</h4>
+            <ul>
+                <li>Simple implementation and easy to understand</li>
+                <li>Fast memory allocation - just find an available partition</li>
+                <li>Low overhead for memory management</li>
+                <li>Easy to protect processes from each other</li>
+            </ul>
+
+            <h4>Disadvantages of Fixed Partitioning</h4>
+            <ul>
+                <li>Suffers from internal fragmentation</li>
+                <li>Limits the number of processes that can run simultaneously</li>
+                <li>Inefficient memory utilization</li>
+                <li>Cannot accommodate processes larger than the largest partition</li>
+                <li>Inflexible - cannot adapt to varying process sizes</li>
+            </ul>
+
+            <h3>2. Variable Partitioning (Dynamic Partitioning)</h3>
+
+            <div class="definition">
+                Variable partitioning allocates memory dynamically based on the exact requirements of processes. Partitions are created dynamically at runtime, with each partition being exactly the size needed by the process.
+            </div>
+
+            <h4>Characteristics of Variable Partitioning</h4>
+            <ul>
+                <li>Memory is initially one large free block</li>
+                <li>Partitions are created as processes arrive</li>
+                <li>Each partition is exactly the size required by the process</li>
+                <li>No internal fragmentation initially</li>
+                <li>Number and size of partitions vary dynamically</li>
+                <li>More complex to implement than fixed partitioning</li>
+            </ul>
+
+            <h4>Advantages of Variable Partitioning</h4>
+            <ul>
+                <li>No internal fragmentation (initially)</li>
+                <li>Better memory utilization compared to fixed partitioning</li>
+                <li>Can accommodate processes of any size (within memory limits)</li>
+                <li>More flexible than fixed partitioning</li>
+                <li>Degree of multiprogramming is not fixed</li>
+            </ul>
+
+            <h4>Disadvantages of Variable Partitioning</h4>
+            <ul>
+                <li>Suffers from external fragmentation</li>
+                <li>More complex allocation and deallocation algorithms needed</li>
+                <li>Requires compaction to reduce external fragmentation</li>
+                <li>Overhead of maintaining free memory list</li>
+                <li>Difficulty in finding suitable holes for processes</li>
+            </ul>
+
+            <h3>Fragmentation</h3>
+            <p>Fragmentation is a phenomenon in which storage space is used inefficiently, reducing capacity and performance. There are two types of fragmentation:</p>
+
+            <h4>Internal Fragmentation</h4>
+            <div class="definition">
+                Internal fragmentation occurs when allocated memory is larger than the requested memory. The difference between allocated memory and required memory is wasted space within a partition.
+            </div>
+
+            <p>Characteristics of internal fragmentation:</p>
+            <ul>
+                <li>Occurs in fixed partitioning schemes</li>
+                <li>Memory is wasted inside allocated partitions</li>
+                <li>Cannot be used by any other process</li>
+                <li>Difference between partition size and process size</li>
+                <li>Remains until the process terminates</li>
+            </ul>
+
+            <div class="note">
+                <strong>Example:</strong> If a partition is 100 KB and a process needs only 80 KB, the remaining 20 KB is wasted as internal fragmentation. This space cannot be allocated to any other process.
+            </div>
+
+            <p>Solution to internal fragmentation:</p>
+            <ul>
+                <li>Use variable partitioning instead of fixed partitioning</li>
+                <li>Allocate memory in smaller units (like paging)</li>
+                <li>Best-fit allocation strategies</li>
+            </ul>
+
+            <h4>External Fragmentation</h4>
+            <div class="definition">
+                External fragmentation occurs when there is enough total free memory to satisfy a request, but the available memory is not contiguous. Free memory is scattered in small blocks throughout memory.
+            </div>
+
+            <p>Characteristics of external fragmentation:</p>
+            <ul>
+                <li>Occurs in variable partitioning schemes</li>
+                <li>Free memory exists but in non-contiguous blocks</li>
+                <li>Total free memory may be sufficient but unusable</li>
+                <li>Memory is wasted between allocated partitions</li>
+                <li>Increases over time as processes are loaded and terminated</li>
+            </ul>
+
+            <div class="note">
+                <strong>Example:</strong> If there are three free blocks of 10 KB, 15 KB, and 20 KB, but a process needs 40 KB of contiguous memory, the request cannot be satisfied even though total free memory (45 KB) is sufficient.
+            </div>
+
+            <p>Solutions to external fragmentation:</p>
+            <ul>
+                <li><strong>Compaction:</strong> Relocating all processes to one end of memory, leaving all free space in one contiguous block</li>
+                <li><strong>Paging:</strong> Dividing memory into fixed-size pages to eliminate the need for contiguous allocation</li>
+                <li><strong>Segmentation:</strong> Dividing processes into segments that can be placed in non-contiguous memory locations</li>
+            </ul>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Internal Fragmentation</th>
+                        <th>External Fragmentation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Definition</td>
+                        <td>Wasted space within allocated partition</td>
+                        <td>Wasted space between partitions</td>
+                    </tr>
+                    <tr>
+                        <td>Occurs In</td>
+                        <td>Fixed partitioning, paging</td>
+                        <td>Variable partitioning</td>
+                    </tr>
+                    <tr>
+                        <td>Location</td>
+                        <td>Inside allocated memory</td>
+                        <td>Outside allocated memory</td>
+                    </tr>
+                    <tr>
+                        <td>Solution</td>
+                        <td>Use variable partitioning or smaller page sizes</td>
+                        <td>Compaction, paging, segmentation</td>
+                    </tr>
+                    <tr>
+                        <td>Memory Waste</td>
+                        <td>Within partition</td>
+                        <td>Between partitions</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="important">
+                <strong>Key Difference for Exams:</strong> Internal fragmentation wastes space WITHIN allocated partitions, while external fragmentation wastes space BETWEEN partitions. Fixed partitioning suffers from internal fragmentation, while variable partitioning suffers from external fragmentation.
+            </div>
+        </section>
+
+        <section id="paging">
+            <h2>4. Paging</h2>
+
+            <div class="definition">
+                Paging is a memory management scheme that eliminates the need for contiguous allocation of physical memory. It divides physical memory into fixed-size blocks called frames and logical memory into blocks of the same size called pages.
+            </div>
+
+            <h3>Concept of Paging</h3>
+            <p>Paging is a non-contiguous memory allocation technique that allows a process's physical address space to be non-contiguous. The main idea behind paging is:</p>
+
+            <ul>
+                <li>Divide the logical memory (process) into fixed-size blocks called pages</li>
+                <li>Divide the physical memory (RAM) into fixed-size blocks called frames</li>
+                <li>Page size equals frame size (typically 4 KB, 8 KB, or larger)</li>
+                <li>When a process needs to execute, its pages are loaded into available frames</li>
+                <li>Pages of a process need not be placed in contiguous frames</li>
+                <li>Operating system keeps track of all free frames</li>
+            </ul>
+
+            <h3>Page and Frame</h3>
+
+            <h4>Page</h4>
+            <div class="definition">
+                A page is a fixed-size block of logical memory (process address space). It represents a portion of the process that will be loaded into a frame in physical memory.
+            </div>
+
+            <p>Characteristics of pages:</p>
+            <ul>
+                <li>Fixed size determined by the system architecture</li>
+                <li>Part of the logical address space</li>
+                <li>All pages of a process are of equal size</li>
+                <li>Numbered sequentially starting from 0</li>
+                <li>Can be loaded into any available frame</li>
+            </ul>
+
+            <h4>Frame</h4>
+            <div class="definition">
+                A frame is a fixed-size block of physical memory (RAM). It is the physical counterpart of a page and has the same size as a page.
+            </div>
+
+            <p>Characteristics of frames:</p>
+            <ul>
+                <li>Fixed size, same as page size</li>
+                <li>Part of the physical address space</li>
+                <li>All frames are of equal size</li>
+                <li>Numbered sequentially starting from 0</li>
+                <li>Can hold any page from any process</li>
+            </ul>
+
+            <h3>Page Table</h3>
+            <div class="definition">
+                A page table is a data structure used by the operating system to store the mapping between logical pages and physical frames. Each process has its own page table maintained by the operating system.
+            </div>
+
+            <p>Key features of page table:</p>
+            <ul>
+                <li>Each entry in the page table contains the frame number where the corresponding page is stored</li>
+                <li>Page number is used as an index into the page table</li>
+                <li>Stores the base address of each page in physical memory</li>
+                <li>Each process has a separate page table</li>
+                <li>Page table is stored in main memory</li>
+                <li>Page Table Base Register (PTBR) points to the page table</li>
+            </ul>
+
+            <p>Page table entry typically contains:</p>
+            <ul>
+                <li><strong>Frame number:</strong> The physical frame where the page is located</li>
+                <li><strong>Valid/Invalid bit:</strong> Indicates whether the page is in memory or not</li>
+                <li><strong>Protection bits:</strong> Read, write, execute permissions</li>
+                <li><strong>Reference bit:</strong> Indicates if the page has been accessed recently</li>
+                <li><strong>Modified/Dirty bit:</strong> Indicates if the page has been modified</li>
+            </ul>
+
+            <h3>Address Translation in Paging</h3>
+            <p>The CPU generates a logical address that consists of two parts:</p>
+
+            <ul>
+                <li><strong>Page Number (p):</strong> Used as an index into the page table to get the frame number</li>
+                <li><strong>Page Offset (d):</strong> Combined with the frame number to get the exact physical address</li>
+            </ul>
+
+            <div class="note">
+                <strong>Address Translation Process:</strong>
+                <ol>
+                    <li>CPU generates logical address = (page number, page offset)</li>
+                    <li>Page number is used to index the page table</li>
+                    <li>Page table provides the corresponding frame number</li>
+                    <li>Physical address = (frame number, page offset)</li>
+                    <li>Physical address is sent to memory to access data</li>
+                </ol>
+            </div>
+
+            <p>Formula for address calculation:</p>
+            <ul>
+                <li>If logical address space = 2^m and page size = 2^n</li>
+                <li>Number of pages = 2^(m-n)</li>
+                <li>Page number = m - n bits (higher order bits)</li>
+                <li>Page offset = n bits (lower order bits)</li>
+                <li>Physical address = Frame number + Page offset</li>
+            </ul>
+
+            <div class="note">
+                <strong>Example:</strong> Consider a logical address of 16 bits with page size of 4 KB (2^12 bytes)
+                <ul>
+                    <li>Logical address space = 2^16 = 64 KB</li>
+                    <li>Page offset = 12 bits (for 4 KB pages)</li>
+                    <li>Page number = 16 - 12 = 4 bits</li>
+                    <li>Number of pages = 2^4 = 16 pages</li>
+                </ul>
+            </div>
+
+            <h3>Advantages of Paging</h3>
+            <ul>
+                <li><strong>No External Fragmentation:</strong> Since frames and pages are of equal fixed size, there is no external fragmentation</li>
+                <li><strong>Efficient Memory Utilization:</strong> Any free frame can be allocated to any page, improving memory usage</li>
+                <li><strong>Simple to Implement:</strong> Fixed-size pages and frames make implementation straightforward</li>
+                <li><strong>Easy Swapping:</strong> Pages can be easily swapped between main memory and secondary storage</li>
+                <li><strong>Supports Virtual Memory:</strong> Enables implementation of virtual memory systems</li>
+                <li><strong>Process Size Independence:</strong> Process size need not be limited by contiguous memory availability</li>
+                <li><strong>Protection and Sharing:</strong> Easy to implement memory protection and sharing at page level</li>
+            </ul>
+
+            <h3>Disadvantages of Paging</h3>
+            <ul>
+                <li><strong>Internal Fragmentation:</strong> Last page of a process may not be completely filled, causing internal fragmentation</li>
+                <li><strong>Page Table Overhead:</strong> Each process requires a page table stored in memory, consuming space</li>
+                <li><strong>Memory Access Time:</strong> Requires two memory accesses - one for page table, one for actual data (solved using TLB)</li>
+                <li><strong>Complex Hardware:</strong> Requires MMU and additional hardware support for address translation</li>
+                <li><strong>Page Table Size:</strong> For large address spaces, page tables can become very large</li>
+            </ul>
+
+            <div class="important">
+                <strong>Important for Exams:</strong> Paging eliminates external fragmentation but may suffer from internal fragmentation. The key advantage is that it allows non-contiguous memory allocation, making better use of available memory.
+            </div>
+        </section>
+
+        <section id="segmentation">
+            <h2>5. Segmentation</h2>
+
+            <div class="definition">
+                Segmentation is a memory management scheme that supports the user's view of memory. A program is a collection of segments such as main program, procedures, functions, methods, objects, local variables, global variables, etc. Segmentation divides the process into variable-size segments.
+            </div>
+
+            <h3>Concept of Segmentation</h3>
+            <p>Segmentation is based on the logical division of a program. Unlike paging, which divides memory into fixed-size blocks without regard to program structure, segmentation divides a program into logical units called segments.</p>
+
+            <p>Key concepts of segmentation:</p>
+            <ul>
+                <li>Program is divided into meaningful logical units (segments)</li>
+                <li>Each segment represents a logical entity: code, data, stack, heap, etc.</li>
+                <li>Segments are of variable size</li>
+                <li>Each segment has a name and a length</li>
+                <li>Segments are numbered starting from 0</li>
+                <li>More aligned with the programmer's view of memory</li>
+            </ul>
+
+            <p>Common segments in a program:</p>
+            <ul>
+                <li><strong>Code Segment:</strong> Contains executable instructions</li>
+                <li><strong>Data Segment:</strong> Contains global and static variables</li>
+                <li><strong>Stack Segment:</strong> Contains local variables and function call information</li>
+                <li><strong>Heap Segment:</strong> Contains dynamically allocated memory</li>
+                <li><strong>Symbol Table:</strong> Contains information about variables and functions</li>
+            </ul>
+
+            <h3>Segment Table</h3>
+            <div class="definition">
+                A segment table is a data structure that stores information about all segments of a process. It maps segment numbers to their base addresses and lengths in physical memory.
+            </div>
+
+            <p>Each entry in the segment table contains:</p>
+            <ul>
+                <li><strong>Segment Base:</strong> Starting physical address where the segment resides in memory</li>
+                <li><strong>Segment Limit:</strong> Length of the segment (specifies the size of the segment)</li>
+                <li><strong>Protection Bits:</strong> Read, write, execute permissions for the segment</li>
+                <li><strong>Valid Bit:</strong> Indicates whether the segment is currently in memory</li>
+            </ul>
+
+            <p>The segment table is used to:</p>
+            <ul>
+                <li>Translate logical addresses to physical addresses</li>
+                <li>Check if the offset is within the segment limit (protection)</li>
+                <li>Determine the location of each segment in physical memory</li>
+                <li>Manage segment allocation and deallocation</li>
+            </ul>
+
+            <h3>Address Translation in Segmentation</h3>
+            <p>A logical address in segmentation consists of two parts:</p>
+
+            <ul>
+                <li><strong>Segment Number (s):</strong> Identifies which segment the address refers to</li>
+                <li><strong>Segment Offset (d):</strong> Specifies the location within the segment</li>
+            </ul>
+
+            <div class="note">
+                <strong>Address Translation Process:</strong>
+                <ol>
+                    <li>CPU generates logical address = (segment number, offset)</li>
+                    <li>Segment number is used to index the segment table</li>
+                    <li>Check if offset < segment limit (if not, generate error - addressing beyond segment)</li>
+                    <li>If valid, get segment base from segment table</li>
+                    <li>Physical address = Segment base + Offset</li>
+                    <li>Access the physical memory location</li>
+                </ol>
+            </div>
+
+            <p>Protection in segmentation:</p>
+            <ul>
+                <li>Each segment has a limit that specifies its length</li>
+                <li>If offset exceeds segment limit, a trap (error) is generated</li>
+                <li>Prevents processes from accessing memory outside their segments</li>
+                <li>Protection bits control read/write/execute permissions</li>
+            </ul>
+
+            <div class="note">
+                <strong>Example:</strong> If segment 2 has base = 4300 and limit = 400, and the logical address is (2, 53):
+                <ul>
+                    <li>Segment number = 2</li>
+                    <li>Offset = 53</li>
+                    <li>Check: 53 < 400 (valid)</li>
+                    <li>Physical address = 4300 + 53 = 4353</li>
+                </ul>
+                If the logical address were (2, 500), it would be invalid since 500 > 400 (segment limit).
+            </div>
+
+            <h3>Advantages of Segmentation</h3>
+            <ul>
+                <li><strong>Logical Division:</strong> Segments represent logical program units, matching the programmer's view</li>
+                <li><strong>No Internal Fragmentation:</strong> Segments are allocated exactly the size needed</li>
+                <li><strong>Easy Sharing:</strong> Segments like code libraries can be easily shared between processes</li>
+                <li><strong>Protection:</strong> Different protection levels can be assigned to different segments</li>
+                <li><strong>Dynamic Growth:</strong> Segments can grow or shrink dynamically (e.g., stack, heap)</li>
+                <li><strong>Modularity:</strong> Supports modular programming - each module can be a separate segment</li>
+                <li><strong>Separate Compilation:</strong> Segments can be compiled separately and linked later</li>
+            </ul>
+
+            <h3>Disadvantages of Segmentation</h3>
+            <ul>
+                <li><strong>External Fragmentation:</strong> Variable-size segments lead to external fragmentation</li>
+                <li><strong>Complex Memory Management:</strong> Managing variable-size segments is more complex than fixed-size pages</li>
+                <li><strong>Compaction Needed:</strong> May require compaction to reduce external fragmentation</li>
+                <li><strong>Difficult Allocation:</strong> Finding a suitable memory block for a segment can be time-consuming</li>
+                <li><strong>Overhead:</strong> Segment table lookup and limit checking add overhead</li>
+                <li><strong>Limit on Segment Size:</strong> Maximum segment size is limited by the size of the physical memory</li>
+            </ul>
+
+            <div class="important">
+                <strong>Key Point for Exams:</strong> Segmentation reflects the logical structure of programs and is more aligned with how programmers think about memory. However, it suffers from external fragmentation due to variable-size segments.
+            </div>
+        </section>
+
+        <section id="comparison">
+            <h2>6. Paging vs Segmentation</h2>
+
+            <p>Paging and segmentation are both memory management schemes, but they differ fundamentally in their approach and characteristics. Understanding the differences is crucial for AKTU examinations.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Basis</th>
+                        <th>Paging</th>
+                        <th>Segmentation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Definition</td>
+                        <td>Memory management scheme that divides memory into fixed-size pages</td>
+                        <td>Memory management scheme that divides memory into variable-size segments</td>
+                    </tr>
+                    <tr>
+                        <td>Basic Unit</td>
+                        <td>Page (fixed-size)</td>
+                        <td>Segment (variable-size)</td>
+                    </tr>
+                    <tr>
+                        <td>Size</td>
+                        <td>All pages are of equal size</td>
+                        <td>Segments are of different sizes</td>
+                    </tr>
+                    <tr>
+                        <td>Memory View</td>
+                        <td>Physical view - invisible to user</td>
+                        <td>Logical view - visible to user</td>
+                    </tr>
+                    <tr>
+                        <td>User Perspective</td>
+                        <td>Not aligned with user's view of program</td>
+                        <td>Aligned with user's logical view of program</td>
+                    </tr>
+                    <tr>
+                        <td>Division Basis</td>
+                        <td>Divides program arbitrarily</td>
+                        <td>Divides program into logical units</td>
+                    </tr>
+                    <tr>
+                        <td>Address Space</td>
+                        <td>One-dimensional - page number and offset</td>
+                        <td>Two-dimensional - segment number and offset</td>
+                    </tr>
+                    <tr>
+                        <td>Table Structure</td>
+                        <td>Page Table (page number → frame number)</td>
+                        <td>Segment Table (segment number → base and limit)</td>
+                    </tr>
+                    <tr>
+                        <td>Internal Fragmentation</td>
+                        <td>May occur (last page may not be fully used)</td>
+                        <td>No internal fragmentation</td>
+                    </tr>
+                    <tr>
+                        <td>External Fragmentation</td>
+                        <td>No external fragmentation</td>
+                        <td>May occur (gaps between segments)</td>
+                    </tr>
+                    <tr>
+                        <td>Protection</td>
+                        <td>Difficult to implement - pages don't represent logical units</td>
+                        <td>Easy to implement - segments are logical units</td>
+                    </tr>
+                    <tr>
+                        <td>Sharing</td>
+                        <td>Difficult - pages may contain mixed content</td>
+                        <td>Easy - complete logical units can be shared</td>
+                    </tr>
+                    <tr>
+                        <td>Procedure Size</td>
+                        <td>Procedures can span multiple pages</td>
+                        <td>Each procedure is typically one segment</td>
+                    </tr>
+                    <tr>
+                        <td>Growth</td>
+                        <td>Difficult to allow segments to grow</td>
+                        <td>Easier to allow segments to grow dynamically</td>
+                    </tr>
+                    <tr>
+                        <td>Implementation</td>
+                        <td>Simpler implementation</td>
+                        <td>More complex implementation</td>
+                    </tr>
+                    <tr>
+                        <td>Hardware Support</td>
+                        <td>Requires MMU with page table support</td>
+                        <td>Requires MMU with segment table support</td>
+                    </tr>
+                    <tr>
+                        <td>Memory Allocation</td>
+                        <td>Easy - any free frame can be allocated</td>
+                        <td>Complex - need to find suitable hole</td>
+                    </tr>
+                    <tr>
+                        <td>Overhead</td>
+                        <td>Page table overhead</td>
+                        <td>Segment table overhead</td>
+                    </tr>
+                    <tr>
+                        <td>Example</td>
+                        <td>Process divided into 4KB pages</td>
+                        <td>Process divided into code, data, stack segments</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="important">
+                <strong>Important Distinction for Exams:</strong>
+                <ul>
+                    <li><strong>Paging:</strong> Hardware-oriented, fixed-size, eliminates external fragmentation but may have internal fragmentation</li>
+                    <li><strong>Segmentation:</strong> User-oriented, variable-size, eliminates internal fragmentation but may have external fragmentation</li>
+                </ul>
+            </div>
+
+            <h3>Combined Approach: Paged Segmentation</h3>
+            <p>Many modern systems use a combination of both techniques called paged segmentation:</p>
+            <ul>
+                <li>Program is divided into logical segments (user view)</li>
+                <li>Each segment is further divided into fixed-size pages</li>
+                <li>Combines advantages of both schemes</li>
+                <li>Provides logical division with efficient memory management</li>
+                <li>Reduces external fragmentation while maintaining logical structure</li>
+            </ul>
+
+            <div class="note">
+                <strong>Remember:</strong> Paging is transparent to the programmer (physical view), while segmentation is visible to the programmer (logical view). This is a frequently tested concept in AKTU exams.
+            </div>
+        </section>
+
+        <section id="virtual-memory">
+            <h2>7. Virtual Memory</h2>
+
+            <div class="definition">
+                Virtual memory is a memory management technique that creates an illusion for users of a very large main memory. It allows execution of processes that may not be completely in physical memory, enabling the system to run programs larger than the available physical memory.
+            </div>
+
+            <h3>Definition and Concept</h3>
+            <p>Virtual memory is based on the principle that not all parts of a program need to be in physical memory at the same time for execution. It separates the logical memory (as seen by the user) from physical memory (actual RAM).</p>
+
+            <p>Key characteristics of virtual memory:</p>
+            <ul>
+                <li>Logical address space can be much larger than physical address space</li>
+                <li>Only the currently needed portions of a process are kept in physical memory</li>
+                <li>Remaining portions are kept on secondary storage (hard disk)</li>
+                <li>Automatically brings required pages into memory when needed</li>
+                <li>Transparently swaps pages between RAM and disk</li>
+                <li>Each process has its own virtual address space</li>
+            </ul>
+
+            <h3>Need for Virtual Memory</h3>
+            <p>Virtual memory is essential in modern computing for several reasons:</p>
+
+            <h4>1. Overcome Physical Memory Limitations</h4>
+            <p>Many programs are too large to fit entirely in physical memory. Virtual memory allows execution of such programs by loading only necessary portions into RAM.</p>
+
+            <h4>2. Increased Multiprogramming</h4>
+            <p>More processes can reside in memory simultaneously since each process only needs a portion of its code and data in physical memory at any time. This increases CPU utilization and system throughput.</p>
+
+            <h4>3. Efficient Memory Utilization</h4>
+            <p>Programs often do not use their entire address space. Virtual memory ensures that only actively used portions occupy precious physical memory.</p>
+
+            <h4>4. Process Isolation</h4>
+            <p>Each process has its own virtual address space, providing better isolation and protection. One process cannot access another process's memory without explicit permission.</p>
+
+            <h4>5. Simplified Programming</h4>
+            <p>Programmers do not need to worry about the physical memory size. They can write programs assuming a large, continuous address space.</p>
+
+            <h4>6. Shared Memory</h4>
+            <p>Multiple processes can share libraries and common code segments efficiently in virtual memory without duplicating them in physical memory.</p>
+
+            <h4>7. Dynamic Loading</h4>
+            <p>Code and data can be loaded into memory dynamically as needed, rather than loading the entire program at startup.</p>
+
+            <div class="note">
+                <strong>Example:</strong> If physical memory is 4 GB but a program needs 8 GB, virtual memory allows the program to run by keeping frequently used 4 GB in RAM and swapping other portions from disk as needed.
+            </div>
+
+            <h3>Demand Paging</h3>
+
+            <div class="definition">
+                Demand paging is the most common implementation of virtual memory. It loads pages into memory only when they are demanded (needed) during program execution, rather than loading the entire program at once.
+            </div>
+
+            <h4>How Demand Paging Works</h4>
+            <p>The demand paging process involves the following steps:</p>
+
+            <ol>
+                <li><strong>Initial Load:</strong> When a process starts, no pages are loaded into memory initially (or only a few essential pages are loaded)</li>
+                
+                <li><strong>Page Access:</strong> When the process tries to access a page not in memory, a page fault occurs</li>
+                
+                <li><strong>Page Fault Handling:</strong>
+                    <ul>
+                        <li>Operating system checks if the reference is valid</li>
+                        <li>If invalid, terminate the process</li>
+                        <li>If valid but page is on disk, bring it into memory</li>
+                    </ul>
+                </li>
+                
+                <li><strong>Find Free Frame:</strong> Find a free frame in physical memory</li>
+                
+                <li><strong>Load Page:</strong> Schedule a disk operation to read the desired page into the free frame</li>
+                
+                <li><strong>Update Page Table:</strong> Update the page table to indicate the page is now in memory</li>
+                
+                <li><strong>Restart Instruction:</strong> Restart the instruction that caused the page fault</li>
+            </ol>
+
+            <h4>Components of Demand Paging</h4>
+            <ul>
+                <li><strong>Valid-Invalid Bit:</strong> Each page table entry has a bit indicating whether the page is in memory (valid) or on disk (invalid)</li>
+                <li><strong>Page Fault:</strong> Interrupt generated when accessing a page not in memory</li>
+                <li><strong>Page Replacement:</strong> Algorithm to select which page to remove when memory is full</li>
+                <li><strong>Swap Space:</strong> Reserved area on disk to store pages not currently in memory</li>
+            </ul>
+
+            <h4>Advantages of Demand Paging</h4>
+            <ul>
+                <li>Less I/O needed - only load pages when needed</li>
+                <li>Less memory needed - not all pages required simultaneously</li>
+                <li>Faster response time - program starts quickly without loading everything</li>
+                <li>More processes can be accommodated in memory</li>
+                <li>Better memory utilization</li>
+            </ul>
+
+            <h4>Disadvantages of Demand Paging</h4>
+            <ul>
+                <li>Page faults cause performance overhead</li>
+                <li>Requires additional hardware (MMU with valid/invalid bits)</li>
+                <li>Complex page replacement algorithms needed</li>
+                <li>Can lead to thrashing if not managed properly</li>
+                <li>Depends on disk I/O speed for page swapping</li>
+            </ul>
+
+            <h3>Page Fault</h3>
+            <div class="definition">
+                A page fault is an interrupt that occurs when a program tries to access a page that is not currently in physical memory. The operating system must handle this fault by bringing the required page from disk into memory.
+            </div>
+
+            <p>Types of page faults:</p>
+            <ul>
+                <li><strong>Minor/Soft Page Fault:</strong> Page is in memory but not marked in page table (quick to resolve)</li>
+                <li><strong>Major/Hard Page Fault:</strong> Page must be loaded from disk (slow to resolve)</li>
+                <li><strong>Invalid Page Fault:</strong> Access to an invalid memory location (causes segmentation fault)</li>
+            </ul>
+
+            <div class="important">
+                <strong>Performance Impact:</strong> Page faults significantly impact performance because disk access is much slower than memory access. Effective page replacement algorithms minimize page faults to maintain good system performance.
+            </div>
+
+            <div class="note">
+                <strong>Remember for Exams:</strong> Virtual memory allows processes larger than physical memory to execute by using demand paging - loading pages only when needed and swapping them between RAM and disk as required.
+            </div>
+        </section>
+
+        <section id="page-replacement">
+            <h2>8. Page Replacement Algorithms</h2>
+
+            <div class="definition">
+                Page replacement algorithms are used to decide which page to remove from memory when a new page needs to be loaded and all frames are occupied. The goal is to minimize the number of page faults.
+            </div>
+
+            <h3>Page Fault</h3>
+            <div class="definition">
+                A page fault occurs when a process tries to access a page that is not currently present in physical memory. This triggers the operating system to load the required page from secondary storage into a free frame in memory.
+            </div>
+
+            <p>When a page fault occurs:</p>
+            <ul>
+                <li>If there is a free frame available, the page is loaded into that frame</li>
+                <li>If no free frame is available, a page replacement algorithm selects a victim page to evict</li>
+                <li>If the victim page has been modified (dirty bit set), it must be written back to disk</li>
+                <li>The new page is then loaded into the freed frame</li>
+                <li>Page table is updated to reflect the changes</li>
+                <li>The instruction that caused the page fault is restarted</li>
+            </ul>
+
+            <h3>Page Replacement Algorithms</h3>
+
+            <h4>1. FIFO (First-In-First-Out) Page Replacement</h4>
+
+            <div class="definition">
+                FIFO is the simplest page replacement algorithm. It replaces the oldest page in memory - the page that has been in memory for the longest time.
+            </div>
+
+            <h5>How FIFO Works</h5>
+            <ul>
+                <li>Maintains a queue of pages in the order they were loaded</li>
+                <li>When a page fault occurs and memory is full, remove the page at the front of the queue (oldest page)</li>
+                <li>Add the new page to the rear of the queue</li>
+                <li>Simple to implement using a circular queue or linked list</li>
+            </ul>
+
+            <h5>Advantages of FIFO</h5>
+            <ul>
+                <li>Simple and easy to understand</li>
+                <li>Easy to implement - just maintain a queue</li>
+                <li>Low overhead - minimal bookkeeping required</li>
+                <li>Fair in terms of age - all pages get equal treatment</li>
+            </ul>
+
+            <h5>Disadvantages of FIFO</h5>
+            <ul>
+                <li>Poor performance - does not consider page usage patterns</li>
+                <li>May replace frequently used pages</li>
+                <li>Suffers from Belady's Anomaly - increasing frames can increase page faults</li>
+                <li>Does not account for page reference patterns</li>
+                <li>Oldest page might be heavily used</li>
+            </ul>
+
+            <div class="note">
+                <strong>Belady's Anomaly:</strong> A phenomenon where increasing the number of page frames results in an increase in page faults for certain page reference patterns. This is a unique problem with FIFO algorithm.
+            </div>
+
+            <h4>2. Optimal Page Replacement (OPT or MIN)</h4>
+
+            <div class="definition">
+                Optimal page replacement algorithm replaces the page that will not be used for the longest period of time in the future. It has the lowest page fault rate among all algorithms.
+            </div>
+
+            <h5>How Optimal Algorithm Works</h5>
+            <ul>
+                <li>Look forward in the reference string to see when each page will be used next</li>
+                <li>Replace the page that will be used farthest in the future</li>
+                <li>If a page will never be used again, select it immediately</li>
+                <li>Guarantees the lowest possible page fault rate</li>
+            </ul>
+
+            <h5>Advantages of Optimal Algorithm</h5>
+            <ul>
+                <li>Provides the best possible performance - minimum page faults</li>
+                <li>Does not suffer from Belady's Anomaly</li>
+                <li>Serves as a benchmark to compare other algorithms</li>
+                <li>Theoretically optimal solution</li>
+            </ul>
+
+            <h5>Disadvantages of Optimal Algorithm</h5>
+            <ul>
+                <li>Impossible to implement in practice - requires knowledge of future page references</li>
+                <li>Used only for theoretical comparison and simulation studies</li>
+                <li>Cannot predict future page access patterns</li>
+                <li>Purely theoretical algorithm</li>
+            </ul>
+
+            <div class="important">
+                <strong>Important Point:</strong> Optimal algorithm is not practically implementable but is used as a benchmark. Other algorithms are compared against optimal to measure their effectiveness.
+            </div>
+
+            <h4>3. LRU (Least Recently Used) Page Replacement</h4>
+
+            <div class="definition">
+                LRU algorithm replaces the page that has not been used for the longest period of time. It is based on the principle of temporal locality - recently used pages are likely to be used again soon.
+            </div>
+
+            <h5>How LRU Works</h5>
+            <ul>
+                <li>Keeps track of when each page was last used</li>
+                <li>When a page fault occurs, replace the page with the oldest timestamp</li>
+                <li>Based on past behavior to predict future behavior</li>
+                <li>Approximates optimal algorithm by using past instead of future</li>
+            </ul>
+
+            <h5>Implementation Methods for LRU</h5>
+            <ul>
+                <li><strong>Counter Method:</strong> Associate a counter with each page, update on access, replace page with smallest counter</li>
+                <li><strong>Stack Method:</strong> Maintain a stack of page numbers, most recently used on top, least recently used at bottom</li>
+                <li><strong>Time-of-Use Field:</strong> Store timestamp of last access, replace page with oldest timestamp</li>
+            </ul>
+
+            <h5>Advantages of LRU</h5>
+            <ul>
+                <li>Good performance - approximates optimal algorithm well</li>
+                <li>Does not suffer from Belady's Anomaly</li>
+                <li>Based on sound principle of locality of reference</li>
+                <li>Performs better than FIFO in most cases</li>
+                <li>Widely used in practice (approximations)</li>
+            </ul>
+
+            <h5>Disadvantages of LRU</h5>
+            <ul>
+                <li>Requires substantial hardware support for exact implementation</li>
+                <li>Overhead of maintaining usage information</li>
+                <li>Difficult to implement efficiently</li>
+                <li>May require updating on every memory access</li>
+                <li>Approximations are used in practice due to complexity</li>
+            </ul>
+
+            <div class="note">
+                <strong>Practical Implementation:</strong> Exact LRU is difficult to implement, so systems use approximations like Second Chance, Clock, or NFU (Not Frequently Used) algorithms.
+            </div>
+
+            <h3>Comparison of Page Replacement Algorithms</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Algorithm</th>
+                        <th>Selection Criterion</th>
+                        <th>Performance</th>
+                        <th>Implementation</th>
+                        <th>Belady's Anomaly</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>FIFO</td>
+                        <td>Oldest page in memory</td>
+                        <td>Poor - highest page faults</td>
+                        <td>Very simple - queue</td>
+                        <td>Yes</td>
+                    </tr>
+                    <tr>
+                        <td>Optimal</td>
+                        <td>Page used farthest in future</td>
+                        <td>Best - minimum page faults</td>
+                        <td>Impossible - needs future knowledge</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td>LRU</td>
+                        <td>Least recently used page</td>
+                        <td>Good - approximates optimal</td>
+                        <td>Complex - needs hardware support</td>
+                        <td>No</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="important">
+                <strong>Key Points for Exams:</strong>
+                <ul>
+                    <li>FIFO: Simplest but poor performance, suffers from Belady's Anomaly</li>
+                    <li>Optimal: Best performance but not implementable in practice</li>
+                    <li>LRU: Good performance, practical approximations exist, no Belady's Anomaly</li>
+                    <li>The goal of all algorithms is to minimize page faults</li>
+                </ul>
+            </div>
+
+            <h3>Factors Affecting Page Replacement Performance</h3>
+            <ul>
+                <li><strong>Number of Frames:</strong> More frames generally means fewer page faults (except in Belady's Anomaly)</li>
+                <li><strong>Reference String Pattern:</strong> Locality of reference affects all algorithms</li>
+                <li><strong>Page Size:</strong> Larger pages reduce page faults but increase internal fragmentation</li>
+                <li><strong>Program Behavior:</strong> Sequential vs random access patterns</li>
+            </ul>
+        </section>
+
+        <section id="thrashing">
+            <h2>9. Thrashing</h2>
+
+            <div class="definition">
+                Thrashing is a condition in virtual memory systems where the system spends more time swapping pages in and out of memory than executing actual processes. The CPU utilization drops dramatically while disk I/O activity increases significantly.
+            </div>
+
+            <h3>Understanding Thrashing</h3>
+            <p>Thrashing occurs when a process does not have enough frames allocated to it to support its active pages. As a result:</p>
+
+            <ul>
+                <li>The process constantly experiences page faults</li>
+                <li>Most of its time is spent in page replacement rather than execution</li>
+                <li>The operating system spends excessive time swapping pages</li>
+                <li>System performance degrades severely</li>
+                <li>CPU utilization falls to very low levels</li>
+                <li>Overall system throughput decreases dramatically</li>
+            </ul>
+
+            <div class="note">
+                <strong>The Thrashing Cycle:</strong>
+                <ol>
+                    <li>Operating system monitors CPU utilization</li>
+                    <li>If CPU utilization is low, OS decides to increase degree of multiprogramming</li>
+                    <li>More processes are introduced into memory</li>
+                    <li>Each process gets fewer frames</li>
+                    <li>Processes start experiencing more page faults</li>
+                    <li>Processes spend more time waiting for page swaps</li>
+                    <li>CPU utilization drops further</li>
+                    <li>OS again tries to increase multiprogramming, worsening the problem</li>
+                </ol>
+            </div>
+
+            <h3>Causes of Thrashing</h3>
+
+            <h4>1. Insufficient Memory Allocation</h4>
+            <p>When a process is allocated fewer frames than it needs to maintain its working set, it will constantly experience page faults. The working set is the set of pages the process is actively using.</p>
+
+            <h4>2. High Degree of Multiprogramming</h4>
+            <p>When too many processes are loaded into memory simultaneously, each process gets fewer frames. If the total frame allocation is less than the sum of working sets of all processes, thrashing occurs.</p>
+
+            <h4>3. Poor Page Replacement Algorithm</h4>
+            <p>Inefficient page replacement algorithms may replace pages that will be needed soon, causing frequent page faults and contributing to thrashing.</p>
+
+            <h4>4. Lack of Locality of Reference</h4>
+            <p>Programs with poor locality of reference (accessing many different pages frequently) are more prone to causing thrashing.</p>
+
+            <h4>5. Large Working Set</h4>
+            <p>If a process has a large working set that cannot fit in the allocated frames, it will experience continuous page faults.</p>
+
+            <h3>Effects of Thrashing</h3>
+            <ul>
+                <li><strong>Severe Performance Degradation:</strong> System becomes extremely slow and unresponsive</li>
+                <li><strong>Low CPU Utilization:</strong> CPU remains idle waiting for page swaps to complete</li>
+                <li><strong>High Disk Activity:</strong> Disk I/O increases dramatically due to constant page swapping</li>
+                <li><strong>Increased Response Time:</strong> Processes take much longer to complete</li>
+                <li><strong>System Instability:</strong> May lead to system hang or crash in extreme cases</li>
+                <li><strong>Reduced Throughput:</strong> Fewer processes complete per unit time</li>
+            </ul>
+
+            <h3>Prevention and Recovery Techniques</h3>
+
+            <h4>1. Working Set Model</h4>
+            <div class="definition">
+                The working set of a process is the set of pages the process is currently using. The working set model allocates enough frames to hold the entire working set of each process.
+            </div>
+
+            <p>Prevention strategy:</p>
+            <ul>
+                <li>Monitor the working set size of each process</li>
+                <li>Allocate sufficient frames to accommodate the working set</li>
+                <li>Only admit new processes if enough frames are available</li>
+                <li>If total frames needed exceed available frames, suspend some processes</li>
+            </ul>
+
+            <h4>2. Page Fault Frequency (PFF) Scheme</h4>
+            <div class="definition">
+                The page fault frequency approach establishes acceptable upper and lower bounds for the page fault rate. If the actual rate goes outside these bounds, the number of frames allocated is adjusted.
+            </div>
+
+            <p>How PFF works:</p>
+            <ul>
+                <li>Set an upper threshold and lower threshold for page fault rate</li>
+                <li>If page fault rate exceeds upper threshold, allocate more frames to the process</li>
+                <li>If page fault rate falls below lower threshold, remove frames from the process</li>
+                <li>If no free frames available when more are needed, suspend a process</li>
+            </ul>
+
+            <h4>3. Reduce Degree of Multiprogramming</h4>
+            <p>Control the number of processes in memory:</p>
+            <ul>
+                <li>Limit the number of concurrent processes</li>
+                <li>Suspend some processes to free up frames for remaining processes</li>
+                <li>Use medium-term scheduler to swap out processes temporarily</li>
+                <li>Restart suspended processes when thrashing subsides</li>
+            </ul>
+
+            <h4>4. Increase Physical Memory</h4>
+            <p>The most straightforward solution:</p>
+            <ul>
+                <li>Add more RAM to the system</li>
+                <li>Provides more frames for processes</li>
+                <li>Reduces competition for memory</li>
+                <li>May not be feasible or cost-effective</li>
+            </ul>
+
+            <h4>5. Improve Locality of Reference</h4>
+            <p>Program optimization:</p>
+            <ul>
+                <li>Structure programs to have better locality</li>
+                <li>Group related data and code together</li>
+                <li>Use efficient data structures and algorithms</li>
+                <li>Minimize scattered memory access patterns</li>
+            </ul>
+
+            <h4>6. Use Better Page Replacement Algorithms</h4>
+            <p>Algorithm selection:</p>
+            <ul>
+                <li>Use LRU or its approximations instead of FIFO</li>
+                <li>Implement algorithms that consider locality</li>
+                <li>Use algorithms that adapt to process behavior</li>
+            </ul>
+
+            <h4>7. Priority-Based Scheduling</h4>
+            <p>Resource allocation based on priority:</p>
+            <ul>
+                <li>Give more frames to high-priority processes</li>
+                <li>Suspend low-priority processes during high load</li>
+                <li>Ensure critical processes have adequate frames</li>
+            </ul>
+
+            <div class="important">
+                <strong>Key Prevention Strategy:</strong> The fundamental solution to thrashing is ensuring that each process has enough frames to hold its working set. This requires careful monitoring and dynamic adjustment of frame allocation.
+            </div>
+
+            <h3>Detection of Thrashing</h3>
+            <p>Thrashing can be detected by monitoring:</p>
+            <ul>
+                <li>Page fault rate - sudden and sustained increase indicates thrashing</li>
+                <li>CPU utilization - drops significantly during thrashing</li>
+                <li>Disk I/O activity - increases dramatically during thrashing</li>
+                <li>Process queue lengths - ready queue empties while waiting queue grows</li>
+                <li>System response time - increases substantially</li>
+            </ul>
+
+            <div class="note">
+                <strong>Remember for Exams:</strong> Thrashing is characterized by high paging activity, low CPU utilization, and poor system performance. It occurs when the system has too many processes competing for too few frames. Prevention involves ensuring adequate frame allocation based on working set size or page fault frequency.
+            </div>
+        </section>
+
+        <section id="exam" class="exam-focus">
+            <h2>10. Exam Focus Box</h2>
+
+            <h3>Important Definitions to Memorize</h3>
+            <ul>
+                <li><strong>Memory Management:</strong> Process of controlling and coordinating computer memory, allocating blocks to programs to optimize system performance</li>
+                <li><strong>Logical Address:</strong> Address generated by CPU during program execution, also called virtual address</li>
+                <li><strong>Physical Address:</strong> Actual address in main memory where data is stored</li>
+                <li><strong>Address Binding:</strong> Mapping of program addresses to actual physical memory addresses</li>
+                <li><strong>Internal Fragmentation:</strong> Wasted space within allocated memory partitions</li>
+                <li><strong>External Fragmentation:</strong> Free memory scattered in small non-contiguous blocks</li>
+                <li><strong>Paging:</strong> Memory management scheme dividing memory into fixed-size pages and frames</li>
+                <li><strong>Segmentation:</strong> Memory management scheme dividing program into variable-size logical segments</li>
+                <li><strong>Virtual Memory:</strong> Technique creating illusion of large memory by using disk as extension of RAM</li>
+                <li><strong>Demand Paging:</strong> Loading pages into memory only when they are demanded during execution</li>
+                <li><strong>Page Fault:</strong> Interrupt occurring when accessing a page not in physical memory</li>
+                <li><strong>Thrashing:</strong> Condition where system spends more time swapping pages than executing processes</li>
+                <li><strong>Working Set:</strong> Set of pages a process is actively using at a given time</li>
+            </ul>
+
+            <h3>Frequently Asked AKTU Questions from Unit 4</h3>
+            <ul>
+                <li>Define memory management and explain its goals</li>
+                <li>Differentiate between logical address and physical address</li>
+                <li>Explain different types of address binding with examples</li>
+                <li>Compare fixed partitioning and variable partitioning</li>
+                <li>Differentiate between internal fragmentation and external fragmentation</li>
+                <li>Explain the concept of paging with address translation</li>
+                <li>What is a page table? Explain its structure and purpose</li>
+                <li>Explain segmentation and how it differs from paging</li>
+                <li>Compare paging and segmentation with a table</li>
+                <li>Define virtual memory and explain its need</li>
+                <li>Explain demand paging with its advantages and disadvantages</li>
+                <li>What is a page fault? How is it handled?</li>
+                <li>Explain FIFO page replacement algorithm with example</li>
+                <li>Explain LRU page replacement algorithm</li>
+                <li>Compare FIFO, Optimal, and LRU page replacement algorithms</li>
+                <li>What is Belady's Anomaly? Which algorithm suffers from it?</li>
+                <li>Define thrashing and explain its causes</li>
+                <li>How can thrashing be prevented or controlled?</li>
+                <li>Explain working set model for thrashing prevention</li>
+            </ul>
+
+            <h3>Keywords to Use in Answers</h3>
+            <ul>
+                <li>Contiguous allocation, non-contiguous allocation</li>
+                <li>MMU (Memory Management Unit), address translation</li>
+                <li>Compile-time, load-time, execution-time binding</li>
+                <li>Fixed-size partition, variable-size partition</li>
+                <li>Page, frame, page table, page number, offset</li>
+                <li>Segment, segment table, segment base, segment limit</li>
+                <li>Logical organization, physical organization</li>
+                <li>Virtual address space, physical address space</li>
+                <li>Swap space, page replacement, victim page</li>
+                <li>Valid-invalid bit, dirty bit, reference bit</li>
+                <li>Locality of reference, temporal locality, spatial locality</li>
+                <li>Working set, page fault frequency, degree of multiprogramming</li>
+            </ul>
+
+            <h3>Common Mistakes Students Make</h3>
+            <ul>
+                <li>Confusing logical and physical addresses - remember logical is generated by CPU, physical is actual RAM location</li>
+                <li>Mixing up internal and external fragmentation - internal is WITHIN partitions, external is BETWEEN partitions</li>
+                <li>Forgetting that paging eliminates external fragmentation but may have internal fragmentation</li>
+                <li>Not mentioning that segmentation has external fragmentation but no internal fragmentation</li>
+                <li>Confusing page and frame - page is logical, frame is physical</li>
+                <li>Not clearly explaining the two components of logical address: page number and offset</li>
+                <li>Forgetting that FIFO suffers from Belady's Anomaly while LRU and Optimal do not</li>
+                <li>Not mentioning that Optimal algorithm is not implementable in practice</li>
+                <li>Confusing thrashing with high paging activity - thrashing is EXCESSIVE paging that degrades performance</li>
+                <li>Missing the key point that virtual memory allows programs larger than physical memory to execute</li>
+            </ul>
+
+            <h3>Answer Writing Tips</h3>
+            <ul>
+                <li>For memory management goals, mention at least 5-6 points: allocation, protection, sharing, utilization, etc.</li>
+                <li>When comparing paging and segmentation, always use a table format for clarity</li>
+                <li>For fragmentation questions, give clear examples to illustrate the concept</li>
+                <li>When explaining address translation, show the step-by-step process with components</li>
+                <li>For page replacement algorithms, explain the selection criterion clearly</li>
+                <li>Always mention advantages AND disadvantages when asked about any technique</li>
+                <li>For thrashing, explain causes, effects, and prevention techniques comprehensively</li>
+                <li>Use diagrams where helpful (page table structure, address translation)</li>
+                <li>Define key terms before explaining concepts</li>
+                <li>Conclude with practical significance or applications</li>
+            </ul>
+
+            <h3>High-Weightage Topics</h3>
+            <ul>
+                <li>Paging concept and address translation - 7 to 10 marks</li>
+                <li>Paging vs Segmentation comparison - 7 marks</li>
+                <li>Virtual memory and demand paging - 7 to 10 marks</li>
+                <li>Page replacement algorithms (any two with comparison) - 10 marks</li>
+                <li>Thrashing causes and prevention - 7 marks</li>
+                <li>Internal vs External fragmentation - 5 to 7 marks</li>
+                <li>Address binding types - 5 to 7 marks</li>
+                <li>Memory allocation techniques - 7 marks</li>
+            </ul>
+
+            <h3>Quick Revision Points</h3>
+            <ul>
+                <li>Memory management handles allocation, deallocation, protection, and translation</li>
+                <li>Logical address: CPU generated; Physical address: Actual RAM location</li>
+                <li>Three binding types: compile-time (fixed), load-time (relocatable), execution-time (dynamic)</li>
+                <li>Fixed partitioning → internal fragmentation; Variable partitioning → external fragmentation</li>
+                <li>Paging: fixed-size, no external fragmentation, may have internal fragmentation</li>
+                <li>Segmentation: variable-size, no internal fragmentation, may have external fragmentation</li>
+                <li>Virtual memory = Logical memory > Physical memory, uses demand paging</li>
+                <li>FIFO: simple, poor performance, Belady's Anomaly</li>
+                <li>Optimal: best performance, not implementable</li>
+                <li>LRU: good performance, complex implementation, no Belady's Anomaly</li>
+                <li>Thrashing: excessive paging, low CPU utilization, prevented by working set model</li>
+            </ul>
+
+            <h3>Formula and Calculations to Remember</h3>
+            <ul>
+                <li>Logical Address = Page Number + Page Offset</li>
+                <li>Physical Address = Frame Number + Page Offset</li>
+                <li>Number of pages = Logical address space / Page size</li>
+                <li>Number of frames = Physical address space / Frame size</li>
+                <li>Page offset bits = log₂(page size)</li>
+                <li>Page number bits = Total address bits - Page offset bits</li>
+                <li>Internal fragmentation = Allocated size - Required size</li>
+            </ul>
+
+            <h3>Last-Minute Memory Tricks</h3>
+            <ul>
+                <li><strong>Address Binding:</strong> CLE (Compile, Load, Execution - in increasing flexibility)</li>
+                <li><strong>Fragmentation:</strong> IN-FIX (INternal in FIXed partitioning), EX-VAR (EXternal in VARiable partitioning)</li>
+                <li><strong>Paging vs Segmentation:</strong> Paging is Physical (hardware view), Segmentation is Semantic (user view)</li>
+                <li><strong>Page Replacement:</strong> FIFO-Bad-Belady (FIFO is bad, has Belady's Anomaly)</li>
+                <li><strong>Virtual Memory Benefits:</strong> SMILE (Size, Multiprogramming, Isolation, Loading, Efficiency)</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>Prepared for AKTU B.Tech CSE – Operating System Unit 4: Memory Management</p>
+        <p>Master Memory Management, Excel in Your Exams - All the Best!</p>
+    </footer>
+
+    <script>
+        window.onbeforeprint = function () {
+            alert("Printing is disabled. Please view the content on the website.");
+        };
+        
+        document.addEventListener("contextmenu", function(e) {
+            e.preventDefault();
+        });
+
+        document.addEventListener("keydown", function(e) {
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                alert("Printing is disabled. Please view the content on the website.");
+            }
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                alert("Saving is disabled. Please view the content on the website.");
+            }
+        });
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+```

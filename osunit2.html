@@ -1,0 +1,1165 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operating System – Unit 2 | Process Management | AKTU B.Tech CSE</title>
+    <style>
+        /* Fixed Home Button */
+.home-btn{
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    padding: 8px 14px;
+    background: #1e293b;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    z-index: 10000;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+
+.home-btn:hover{
+    background: #0f172a;
+}
+
+/* Smooth scroll */
+html{
+    scroll-behavior: smooth;
+}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #2c3e50;
+            padding: 20px;
+            position: relative;
+        }
+
+        body::after {
+            content: "operating system unit 2  aktunotes.live";
+            position: fixed;
+            top: 40%;
+            left: 5%;
+            font-size: 24px;
+            color: rgba(0,0,0,0.05);
+            transform: rotate(-30deg);
+            pointer-events: none;
+            z-index: 9999;
+            width: 100%;
+            text-align: center;
+        } 
+
+        @media print {
+            body {
+                display: none !important;
+            } 
+        } 
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+
+        nav {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        nav h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        nav ul {
+            list-style: none;
+            columns: 2;
+            column-gap: 30px;
+        }
+
+        nav ul li {
+            margin: 10px 0;
+            break-inside: avoid;
+        }
+
+        nav ul li a {
+            color: #764ba2;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: block;
+            padding: 8px 12px;
+            border-radius: 5px;
+        }
+
+        nav ul li a:hover {
+            background: #f0f0f0;
+            color: #667eea;
+            transform: translateX(5px);
+        }
+
+        main {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        section {
+            margin-bottom: 50px;
+        }
+
+        section h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        section h3 {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        section h4 {
+            color: #555;
+            font-size: 1.2em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .definition {
+            background: #e8f4f8;
+            border-left: 5px solid #667eea;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+
+        .important {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        table th, table td {
+            padding: 15px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        table tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        table tbody tr:hover {
+            background: #e8f4f8;
+        }
+
+        ul, ol {
+            margin: 15px 0 15px 40px;
+        }
+
+        ul li, ol li {
+            margin: 8px 0;
+        }
+
+        .exam-focus {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 40px;
+        }
+
+        .exam-focus h2 {
+            color: white;
+            border-bottom: 3px solid white;
+        }
+
+        .exam-focus h3 {
+            color: #fff3cd;
+            margin-top: 20px;
+        }
+
+        .exam-focus ul {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .exam-focus ul li::before {
+            content: "✓ ";
+            color: #fff3cd;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            main {
+                padding: 20px;
+            }
+
+            nav ul {
+                columns: 1;
+            }
+
+            body::after {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body id="top">
+    <a href="#top" class="home-btn">↑</a>
+    <header>
+        <h1>Operating System – Unit 2</h1>
+        <p>Process Management | AKTU B.Tech CSE – Exam Oriented Notes</p>
+    </header>
+
+    <nav>
+        <h2>Table of Contents</h2>
+        <ul>
+            <li><a href="#intro">Introduction to Process Management</a></li>
+            <li><a href="#states">Process States</a></li>
+            <li><a href="#pcb">Process Control Block</a></li>
+            <li><a href="#context">Context Switching</a></li>
+            <li><a href="#threads">Threads</a></li>
+            <li><a href="#scheduling">CPU Scheduling</a></li>
+            <li><a href="#algorithms">CPU Scheduling Algorithms</a></li>
+            <li><a href="#concepts">Scheduling Concepts</a></li>
+            <li><a href="#exam">Exam Focus Box</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="intro">
+            <h2>1. Introduction to Process Management</h2>
+            
+            <h3>What is a Process?</h3>
+            <div class="definition">
+                A process is a program in execution. It is an active entity that requires resources such as CPU time, memory, files, and input/output devices to accomplish its task.
+            </div>
+            
+            <p>A process includes the current activity represented by the value of the program counter and the contents of the processor's registers. It also includes the process stack containing temporary data such as function parameters, return addresses, and local variables, and a data section containing global variables.</p>
+
+            <h3>Process vs Program</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Program</th>
+                        <th>Process</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Nature</td>
+                        <td>Passive entity</td>
+                        <td>Active entity</td>
+                    </tr>
+                    <tr>
+                        <td>Existence</td>
+                        <td>Stored on disk</td>
+                        <td>Loaded in memory</td>
+                    </tr>
+                    <tr>
+                        <td>State</td>
+                        <td>Static</td>
+                        <td>Dynamic</td>
+                    </tr>
+                    <tr>
+                        <td>Resource Requirement</td>
+                        <td>Does not require resources</td>
+                        <td>Requires CPU, memory, I/O devices</td>
+                    </tr>
+                    <tr>
+                        <td>Lifespan</td>
+                        <td>Permanent until deleted</td>
+                        <td>Temporary, terminates after execution</td>
+                    </tr>
+                    <tr>
+                        <td>Example</td>
+                        <td>Executable file like notepad.exe</td>
+                        <td>Running instance of notepad</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Importance of Process Management</h3>
+            <p>Process management is a fundamental responsibility of the operating system. It involves the following key activities:</p>
+            <ul>
+                <li>Creation and deletion of both user and system processes</li>
+                <li>Scheduling processes and threads on the CPUs</li>
+                <li>Suspension and resumption of processes</li>
+                <li>Provision of mechanisms for process synchronization</li>
+                <li>Provision of mechanisms for process communication</li>
+                <li>Provision of mechanisms for deadlock handling</li>
+            </ul>
+            <p>Effective process management ensures optimal utilization of system resources, prevents conflicts between processes, and maintains system stability and security.</p>
+        </section>
+
+        <section id="states">
+            <h2>2. Process States</h2>
+            
+            <p>During its execution, a process changes state. The state of a process is defined by the current activity of that process. A process may be in one of the following states:</p>
+
+            <h3>Five-State Process Model</h3>
+
+            <h4>1. New State</h4>
+            <div class="definition">
+                The process is being created. The operating system is setting up the process control block and allocating initial resources.
+            </div>
+            <p>In this state, the process has been created but has not yet been admitted to the pool of executable processes by the operating system.</p>
+
+            <h4>2. Ready State</h4>
+            <div class="definition">
+                The process is waiting to be assigned to a processor. It has all the resources it needs to execute except the CPU.
+            </div>
+            <p>Multiple processes can be in the ready state simultaneously, waiting in a queue for CPU allocation based on the scheduling algorithm.</p>
+
+            <h4>3. Running State</h4>
+            <div class="definition">
+                The process is currently being executed by the CPU. Instructions are being processed.
+            </div>
+            <p>On a single-processor system, only one process can be in the running state at any given time. On multiprocessor systems, multiple processes can run simultaneously.</p>
+
+            <h4>4. Waiting State (Blocked State)</h4>
+            <div class="definition">
+                The process is waiting for some event to occur, such as completion of I/O operation, receipt of a signal, or availability of a resource.
+            </div>
+            <p>A process in the waiting state cannot execute even if the CPU is available. It must wait until the event it is waiting for occurs.</p>
+
+            <h4>5. Terminated State (Exit State)</h4>
+            <div class="definition">
+                The process has finished execution. The operating system is reclaiming the resources allocated to the process.
+            </div>
+            <p>The process has completed its task or has been explicitly killed. Its process control block will be removed from the system.</p>
+
+            <h3>Process State Transitions</h3>
+            <div class="important">
+                <strong>Important State Transitions for AKTU Exams:</strong>
+                <ul>
+                    <li><strong>New → Ready:</strong> The process is admitted to the pool of executable processes</li>
+                    <li><strong>Ready → Running:</strong> The scheduler selects the process for execution (dispatch)</li>
+                    <li><strong>Running → Ready:</strong> Time quantum expires in preemptive scheduling (timeout) or higher priority process arrives</li>
+                    <li><strong>Running → Waiting:</strong> Process requests I/O operation or waits for an event</li>
+                    <li><strong>Waiting → Ready:</strong> I/O operation completes or awaited event occurs</li>
+                    <li><strong>Running → Terminated:</strong> Process completes execution or is aborted</li>
+                </ul>
+            </div>
+
+            <p>Understanding these state transitions is crucial for answering questions related to process lifecycle, scheduling, and system performance in AKTU examinations.</p>
+        </section>
+
+        <section id="pcb">
+            <h2>3. Process Control Block (PCB)</h2>
+
+            <div class="definition">
+                A Process Control Block (PCB) is a data structure maintained by the operating system for every process. It contains all the information needed to manage and control the process.
+            </div>
+
+            <p>The PCB serves as the repository for all information that varies from process to process. It is also known as Task Control Block or Process Descriptor.</p>
+
+            <h3>Contents of PCB</h3>
+            <p>Each PCB contains the following information:</p>
+
+            <h4>1. Process ID (PID)</h4>
+            <p>A unique identifier assigned to each process by the operating system. This allows the OS to distinguish between different processes running in the system.</p>
+
+            <h4>2. Process State</h4>
+            <p>The current state of the process (New, Ready, Running, Waiting, or Terminated). This information helps the scheduler determine which processes are eligible for execution.</p>
+
+            <h4>3. Program Counter</h4>
+            <p>Contains the address of the next instruction to be executed for this process. When a process is interrupted, the program counter value is saved so execution can resume from the correct point.</p>
+
+            <h4>4. CPU Registers</h4>
+            <p>The contents of all processor registers including accumulators, index registers, stack pointers, and general-purpose registers. This information must be saved during a context switch to allow the process to continue execution correctly when it resumes.</p>
+
+            <h4>5. Memory Management Information</h4>
+            <p>Includes information such as:</p>
+            <ul>
+                <li>Base and limit registers defining the memory space allocated to the process</li>
+                <li>Page tables or segment tables</li>
+                <li>Information about memory allocated to the process</li>
+            </ul>
+
+            <h4>6. Accounting Information</h4>
+            <p>Includes information such as:</p>
+            <ul>
+                <li>Amount of CPU time used</li>
+                <li>Time limits</li>
+                <li>Process numbers</li>
+                <li>Account numbers</li>
+                <li>Job or process numbers</li>
+            </ul>
+
+            <h4>7. I/O Status Information</h4>
+            <p>The list of I/O devices allocated to the process, a list of open files, and other I/O related information.</p>
+
+            <h4>8. CPU Scheduling Information</h4>
+            <p>Process priority, pointers to scheduling queues, and other scheduling parameters.</p>
+
+            <h3>Importance of PCB</h3>
+            <div class="important">
+                <strong>Key Points for Examination:</strong>
+                <ul>
+                    <li>PCB is essential for multiprogramming and multitasking</li>
+                    <li>It enables the operating system to support multiple processes</li>
+                    <li>PCB makes context switching possible</li>
+                    <li>It provides all necessary information to restart a process after interruption</li>
+                    <li>PCBs are stored in memory areas protected from normal user access</li>
+                    <li>The operating system maintains a table of pointers to PCBs for efficient process management</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="context">
+            <h2>4. Context Switching</h2>
+
+            <div class="definition">
+                Context switching is the process of storing the state of a currently running process or thread so that it can be restored and resumed from the same point later, and loading the saved state of the next process to be executed.
+            </div>
+
+            <p>Context switching is an essential feature of multitasking operating systems. It allows multiple processes to share a single CPU and enables the operating system to provide the illusion that multiple processes are running simultaneously.</p>
+
+            <h3>Steps Involved in Context Switching</h3>
+            <ol>
+                <li><strong>Save the Context of the Current Process:</strong> The operating system saves the current state of the executing process, including the program counter, CPU registers, and other relevant information, into its Process Control Block (PCB).</li>
+                
+                <li><strong>Update the PCB:</strong> The PCB of the current process is updated with the saved context information and its state is changed from running to ready or waiting as appropriate.</li>
+                
+                <li><strong>Move PCB to Appropriate Queue:</strong> The PCB of the current process is moved to the ready queue or waiting queue depending on why the context switch occurred.</li>
+                
+                <li><strong>Select Next Process:</strong> The CPU scheduler selects the next process to execute from the ready queue based on the scheduling algorithm in use.</li>
+                
+                <li><strong>Update PCB of Selected Process:</strong> The state of the selected process is changed from ready to running.</li>
+                
+                <li><strong>Restore the Context:</strong> The saved context of the selected process is loaded from its PCB into the CPU registers and program counter.</li>
+                
+                <li><strong>Resume Execution:</strong> The CPU begins executing instructions from the point where the selected process was previously interrupted.</li>
+            </ol>
+
+            <h3>When Does Context Switching Occur?</h3>
+            <p>Context switching can occur in several situations:</p>
+            <ul>
+                <li>When a high-priority process arrives and preempts the current process</li>
+                <li>When a time quantum expires in time-sharing systems</li>
+                <li>When the current process makes an I/O request and must wait</li>
+                <li>When the current process terminates</li>
+                <li>When an interrupt occurs</li>
+            </ul>
+
+            <h3>Overhead of Context Switching</h3>
+            <div class="important">
+                <strong>Important Concept for Exams:</strong>
+                Context switching is pure overhead because the system does no useful work while switching contexts.
+            </div>
+
+            <p>The time required for context switching depends on several factors:</p>
+            <ul>
+                <li><strong>Hardware Support:</strong> Systems with hardware support for context switching can perform it faster than those relying entirely on software</li>
+                <li><strong>Number of Registers:</strong> More registers mean more data to save and restore</li>
+                <li><strong>Memory Speed:</strong> Faster memory allows quicker saving and loading of context</li>
+                <li><strong>Number of Processes:</strong> More processes can lead to more frequent context switches</li>
+            </ul>
+
+            <p>Typical context switch times range from a few microseconds to several milliseconds. During this time, the CPU performs no useful computation, which is why minimizing context switching is important for system performance.</p>
+
+            <h3>Impact on System Performance</h3>
+            <ul>
+                <li>Frequent context switching can degrade system performance significantly</li>
+                <li>Too much context switching can lead to thrashing, where the system spends more time switching contexts than executing processes</li>
+                <li>Efficient scheduling algorithms try to balance responsiveness with minimal context switching overhead</li>
+                <li>Modern processors include features to reduce context switching time, such as multiple register sets</li>
+            </ul>
+        </section>
+
+        <section id="threads">
+            <h2>5. Threads</h2>
+
+            <div class="definition">
+                A thread is a basic unit of CPU utilization consisting of a thread ID, a program counter, a register set, and a stack. It shares with other threads belonging to the same process its code section, data section, and other operating system resources such as open files and signals.
+            </div>
+
+            <p>Threads are sometimes called lightweight processes. A traditional process has a single thread of control, while a multithreaded process contains multiple threads of control, allowing it to perform multiple tasks concurrently.</p>
+
+            <h3>Process vs Thread</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Process</th>
+                        <th>Thread</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Definition</td>
+                        <td>Independent program in execution</td>
+                        <td>Subset of a process</td>
+                    </tr>
+                    <tr>
+                        <td>Resource Ownership</td>
+                        <td>Has its own resources (memory, files)</td>
+                        <td>Shares resources with other threads of same process</td>
+                    </tr>
+                    <tr>
+                        <td>Communication</td>
+                        <td>Requires inter-process communication (IPC)</td>
+                        <td>Can communicate easily through shared memory</td>
+                    </tr>
+                    <tr>
+                        <td>Context Switching</td>
+                        <td>Slower and more expensive</td>
+                        <td>Faster and less expensive</td>
+                    </tr>
+                    <tr>
+                        <td>Creation Time</td>
+                        <td>Takes more time</td>
+                        <td>Takes less time</td>
+                    </tr>
+                    <tr>
+                        <td>Termination Time</td>
+                        <td>Takes more time</td>
+                        <td>Takes less time</td>
+                    </tr>
+                    <tr>
+                        <td>Memory</td>
+                        <td>Separate address space</td>
+                        <td>Shares address space</td>
+                    </tr>
+                    <tr>
+                        <td>Isolation</td>
+                        <td>Processes are isolated</td>
+                        <td>Threads are not isolated</td>
+                    </tr>
+                    <tr>
+                        <td>Weight</td>
+                        <td>Heavyweight</td>
+                        <td>Lightweight</td>
+                    </tr>
+                    <tr>
+                        <td>Dependency</td>
+                        <td>Independent</td>
+                        <td>Dependent on parent process</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Advantages of Multithreading</h3>
+
+            <h4>1. Responsiveness</h4>
+            <p>Multithreading allows a program to continue running even if part of it is blocked or performing a lengthy operation. For example, a web browser can continue responding to user input while downloading a file in the background.</p>
+
+            <h4>2. Resource Sharing</h4>
+            <p>Threads share the memory and resources of the process to which they belong. This allows an application to have several different threads of activity within the same address space, making resource sharing efficient.</p>
+
+            <h4>3. Economy</h4>
+            <p>Creating and managing threads is much cheaper than creating and managing processes. Thread creation requires less memory and resources. Context switching between threads is also faster than between processes.</p>
+
+            <h4>4. Scalability</h4>
+            <p>Multithreading can take advantage of multiprocessor architectures. Threads can run in parallel on different processors, increasing the overall speed of execution. A single-threaded process can only run on one CPU, regardless of how many are available.</p>
+
+            <h4>5. Simplified Programming</h4>
+            <p>For certain types of applications, especially those that require concurrent activities, multithreaded programming can be simpler than using multiple processes with inter-process communication.</p>
+
+            <h4>6. Better CPU Utilization</h4>
+            <p>While one thread is waiting for I/O operations, other threads can continue executing, leading to better CPU utilization and improved system throughput.</p>
+
+            <div class="important">
+                <strong>Remember for Exams:</strong> Threads within the same process share code, data, and files, but each thread has its own program counter, registers, and stack.
+            </div>
+        </section>
+
+        <section id="scheduling">
+            <h2>6. CPU Scheduling</h2>
+
+            <div class="definition">
+                CPU scheduling is the process of determining which process in the ready queue will be allocated the CPU for execution. The objective is to maximize CPU utilization and ensure fair allocation of CPU time among processes.
+            </div>
+
+            <p>In a multiprogramming system, multiple processes compete for CPU time. The CPU scheduler selects one process from the ready queue and allocates the CPU to it. Good scheduling can make the system more efficient, faster, and fairer.</p>
+
+            <h3>Need for CPU Scheduling</h3>
+            <ul>
+                <li>Maximize CPU utilization by keeping the CPU busy at all times</li>
+                <li>Ensure fair allocation of CPU among all processes</li>
+                <li>Minimize response time for interactive users</li>
+                <li>Minimize turnaround time for batch processes</li>
+                <li>Maximize throughput (number of processes completed per unit time)</li>
+                <li>Ensure predictable behavior for real-time systems</li>
+            </ul>
+
+            <h3>Scheduling Criteria</h3>
+            <p>Different scheduling algorithms optimize different criteria. The main criteria used to evaluate scheduling algorithms are:</p>
+
+            <h4>1. CPU Utilization</h4>
+            <div class="definition">
+                CPU utilization is the percentage of time the CPU is busy executing processes. It ranges from 0 to 100 percent.
+            </div>
+            <p>The goal is to keep the CPU as busy as possible. In a real system, CPU utilization should range from 40 percent for a lightly loaded system to 90 percent for a heavily loaded system. Higher CPU utilization indicates better use of resources.</p>
+
+            <h4>2. Throughput</h4>
+            <div class="definition">
+                Throughput is the number of processes completed per unit of time. It measures the amount of work accomplished by the system.
+            </div>
+            <p>For long processes, throughput might be one process per hour. For short transactions, it could be ten processes per second. Higher throughput is desirable as it indicates that more work is being completed.</p>
+
+            <h4>3. Turnaround Time</h4>
+            <div class="definition">
+                Turnaround time is the total time taken from process submission to completion. It includes waiting time in the ready queue, execution time on the CPU, and time spent waiting for I/O.
+            </div>
+            <p>Turnaround Time = Completion Time - Arrival Time</p>
+            <p>Lower turnaround time is better. It is an important metric for batch systems where processes are submitted and results are collected later.</p>
+
+            <h4>4. Waiting Time</h4>
+            <div class="definition">
+                Waiting time is the total amount of time a process spends waiting in the ready queue before getting CPU time.
+            </div>
+            <p>Waiting Time = Turnaround Time - Burst Time</p>
+            <p>The scheduling algorithm does not affect the execution time of a process or the I/O time, so it focuses on minimizing waiting time. Lower waiting time indicates better scheduling performance.</p>
+
+            <h4>5. Response Time</h4>
+            <div class="definition">
+                Response time is the time from submission of a request until the first response is produced. It measures how quickly the system responds to user input.
+            </div>
+            <p>Response Time = Time at which first response is produced - Arrival Time</p>
+            <p>This is particularly important for interactive systems where users expect quick feedback. Lower response time provides better user experience. Note that response time is different from turnaround time; it measures when the process first gets the CPU, not when it completes.</p>
+
+            <div class="important">
+                <strong>Key Point for AKTU Exams:</strong>
+                <ul>
+                    <li>Maximize: CPU Utilization and Throughput</li>
+                    <li>Minimize: Turnaround Time, Waiting Time, and Response Time</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="algorithms">
+            <h2>7. CPU Scheduling Algorithms</h2>
+
+            <h3>1. First Come First Serve (FCFS) Scheduling</h3>
+            <div class="definition">
+                FCFS is the simplest CPU scheduling algorithm. The process that requests the CPU first is allocated the CPU first. It is implemented using a FIFO queue.
+            </div>
+
+            <h4>Characteristics of FCFS:</h4>
+            <ul>
+                <li>Non-preemptive algorithm</li>
+                <li>Easy to understand and implement</li>
+                <li>Uses First-In-First-Out queue data structure</li>
+                <li>When a process enters the ready queue, its PCB is linked to the tail of the queue</li>
+                <li>When the CPU is free, it is allocated to the process at the head of the queue</li>
+            </ul>
+
+            <h4>Advantages of FCFS:</h4>
+            <ul>
+                <li>Simple and easy to implement</li>
+                <li>Fair in terms of arrival order</li>
+                <li>No starvation - every process will eventually get CPU time</li>
+                <li>Minimal overhead</li>
+            </ul>
+
+            <h4>Disadvantages of FCFS:</h4>
+            <ul>
+                <li>Average waiting time is often quite long</li>
+                <li>Suffers from convoy effect - short processes may wait for long processes to complete</li>
+                <li>Poor performance in time-sharing systems</li>
+                <li>Not suitable for interactive systems</li>
+                <li>Low CPU and device utilization</li>
+            </ul>
+
+            <div class="important">
+                <strong>Convoy Effect:</strong> When a long process arrives before several short processes, all short processes must wait for the long process to complete, resulting in poor average waiting time. This problem is called the convoy effect.
+            </div>
+
+            <h3>2. Shortest Job First (SJF) Scheduling</h3>
+            <div class="definition">
+                SJF scheduling associates each process with the length of its next CPU burst. When the CPU is available, it is assigned to the process that has the smallest next CPU burst. If two processes have the same burst time, FCFS is used to break the tie.
+            </div>
+
+            <p>SJF can be either preemptive or non-preemptive:</p>
+
+            <h4>Non-Preemptive SJF:</h4>
+            <p>Once the CPU is given to a process, it cannot be preempted until it completes its CPU burst. If a shorter process arrives while the current process is executing, it must wait until the current process finishes.</p>
+
+            <h4>Preemptive SJF (Shortest Remaining Time First - SRTF):</h4>
+            <p>If a new process arrives with a CPU burst length shorter than the remaining time of the currently executing process, the current process is preempted and the CPU is given to the new shorter process.</p>
+
+            <h4>Advantages of SJF:</h4>
+            <ul>
+                <li>Provides minimum average waiting time among all scheduling algorithms</li>
+                <li>Optimal for minimizing average waiting time</li>
+                <li>Better throughput compared to FCFS</li>
+                <li>Reduces number of waiting processes</li>
+            </ul>
+
+            <h4>Disadvantages of SJF:</h4>
+            <ul>
+                <li>Difficult to implement because the length of next CPU burst cannot be known in advance</li>
+                <li>Can lead to starvation of longer processes</li>
+                <li>Not practical for interactive systems</li>
+                <li>Requires accurate prediction of burst time</li>
+                <li>Overhead of calculating or predicting burst times</li>
+            </ul>
+
+            <div class="important">
+                <strong>Starvation in SJF:</strong> Long processes may never get executed if short processes keep arriving. This is a major drawback of SJF scheduling.
+            </div>
+
+            <h3>3. Priority Scheduling</h3>
+            <div class="definition">
+                Priority scheduling assigns a priority to each process, and the CPU is allocated to the process with the highest priority. Processes with equal priority are scheduled in FCFS order.
+            </div>
+
+            <p>Priorities can be defined either internally or externally:</p>
+            <ul>
+                <li><strong>Internal Priorities:</strong> Based on measurable quantities such as time limits, memory requirements, number of open files, ratio of average I/O burst to average CPU burst, etc.</li>
+                <li><strong>External Priorities:</strong> Set by criteria external to the operating system, such as importance of process, type of user, funds being paid for computer use, political factors, etc.</li>
+            </ul>
+
+            <p>Priority scheduling can be either preemptive or non-preemptive:</p>
+
+            <h4>Non-Preemptive Priority Scheduling:</h4>
+            <p>Once a process starts executing, it runs to completion even if a higher priority process arrives.</p>
+
+            <h4>Preemptive Priority Scheduling:</h4>
+            <p>If a new process arrives with higher priority than the currently running process, the current process is preempted and the CPU is allocated to the higher priority process.</p>
+
+            <h4>Advantages of Priority Scheduling:</h4>
+            <ul>
+                <li>Important processes get executed first</li>
+                <li>Flexible - priorities can be adjusted based on system needs</li>
+                <li>Can be used to favor certain types of processes</li>
+                <li>Real-time systems can meet deadlines by assigning high priorities to time-critical tasks</li>
+            </ul>
+
+            <h4>Disadvantages of Priority Scheduling:</h4>
+            <ul>
+                <li>Can lead to indefinite blocking or starvation of low priority processes</li>
+                <li>Overhead of determining priorities</li>
+                <li>Not suitable for systems requiring equal treatment of all processes</li>
+            </ul>
+
+            <div class="important">
+                <strong>Aging Technique:</strong> To prevent starvation in priority scheduling, we can use aging. Aging gradually increases the priority of processes that wait in the system for a long time. This ensures that even low priority processes eventually get executed.
+            </div>
+
+            <h3>4. Round Robin (RR) Scheduling</h3>
+            <div class="definition">
+                Round Robin scheduling is designed especially for time-sharing systems. It is similar to FCFS scheduling, but preemption is added to enable the system to switch between processes. Each process is assigned a fixed time unit called a time quantum or time slice.
+            </div>
+
+            <h4>Working of Round Robin:</h4>
+            <ul>
+                <li>The ready queue is treated as a circular queue</li>
+                <li>The CPU scheduler picks the first process from the ready queue</li>
+                <li>Sets a timer to interrupt after one time quantum</li>
+                <li>Dispatches the process</li>
+                <li>If the process completes before the time quantum expires, the process itself releases the CPU voluntarily</li>
+                <li>If the time quantum expires before the process completes, the timer interrupts and the process is preempted</li>
+                <li>The preempted process is placed at the tail of the ready queue</li>
+                <li>The scheduler selects the next process from the ready queue</li>
+            </ul>
+
+            <h4>Advantages of Round Robin:</h4>
+            <ul>
+                <li>Fair allocation of CPU among all processes</li>
+                <li>No starvation - every process gets a fair share of CPU time</li>
+                <li>Better response time for short processes</li>
+                <li>Suitable for time-sharing systems</li>
+                <li>Good for interactive systems where quick response is needed</li>
+                <li>All processes get equal priority</li>
+            </ul>
+
+            <h4>Disadvantages of Round Robin:</h4>
+            <ul>
+                <li>Higher average waiting time compared to SJF</li>
+                <li>Performance depends heavily on the size of time quantum</li>
+                <li>Context switching overhead can be high</li>
+                <li>Not suitable for real-time systems</li>
+                <li>If time quantum is too small, excessive context switching reduces CPU efficiency</li>
+                <li>If time quantum is too large, it degenerates to FCFS</li>
+            </ul>
+
+            <div class="important">
+                <strong>Choosing Time Quantum:</strong>
+                <ul>
+                    <li>Time quantum should be large compared to context switch time</li>
+                    <li>Typically, time quantum is 10-100 milliseconds</li>
+                    <li>Context switch time is typically less than 10 microseconds</li>
+                    <li>If time quantum is too small: Too many context switches, low CPU efficiency</li>
+                    <li>If time quantum is too large: Behaves like FCFS, poor response time</li>
+                </ul>
+            </div>
+
+            <h3>Comparison of Scheduling Algorithms</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Algorithm</th>
+                        <th>Allocation Type</th>
+                        <th>Average Waiting Time</th>
+                        <th>Starvation</th>
+                        <th>Best For</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>FCFS</td>
+                        <td>Non-preemptive</td>
+                        <td>High</td>
+                        <td>No</td>
+                        <td>Batch systems</td>
+                    </tr>
+                    <tr>
+                        <td>SJF</td>
+                        <td>Both</td>
+                        <td>Minimum</td>
+                        <td>Yes (long processes)</td>
+                        <td>Systems with known burst times</td>
+                    </tr>
+                    <tr>
+                        <td>Priority</td>
+                        <td>Both</td>
+                        <td>Varies</td>
+                        <td>Yes (low priority)</td>
+                        <td>Real-time systems</td>
+                    </tr>
+                    <tr>
+                        <td>Round Robin</td>
+                        <td>Preemptive</td>
+                        <td>Moderate</td>
+                        <td>No</td>
+                        <td>Time-sharing systems</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="concepts">
+            <h2>8. Scheduling Concepts</h2>
+
+            <h3>Preemptive vs Non-Preemptive Scheduling</h3>
+
+            <h4>Non-Preemptive Scheduling</h4>
+            <div class="definition">
+                In non-preemptive scheduling, once the CPU has been allocated to a process, the process keeps the CPU until it releases it either by terminating or by switching to the waiting state. The process cannot be interrupted.
+            </div>
+
+            <p>Characteristics of non-preemptive scheduling:</p>
+            <ul>
+                <li>Process voluntarily releases CPU</li>
+                <li>Simple to implement</li>
+                <li>Lower overhead due to fewer context switches</li>
+                <li>Can lead to poor response time</li>
+                <li>Not suitable for time-sharing systems</li>
+                <li>Examples: FCFS, Non-preemptive SJF, Non-preemptive Priority</li>
+            </ul>
+
+            <h4>Preemptive Scheduling</h4>
+            <div class="definition">
+                In preemptive scheduling, the operating system can interrupt a currently running process and allocate the CPU to another process. The decision to preempt can be made when a new process arrives, when an interrupt occurs, or when a timer expires.
+            </div>
+
+            <p>Characteristics of preemptive scheduling:</p>
+            <ul>
+                <li>Process can be interrupted and moved to ready state</li>
+                <li>Better response time</li>
+                <li>Suitable for time-sharing and real-time systems</li>
+                <li>Higher overhead due to context switching</li>
+                <li>Requires careful synchronization for shared data</li>
+                <li>Examples: Round Robin, Preemptive SJF (SRTF), Preemptive Priority</li>
+            </ul>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Preemptive</th>
+                        <th>Non-Preemptive</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Interruption</td>
+                        <td>Can be interrupted</td>
+                        <td>Cannot be interrupted</td>
+                    </tr>
+                    <tr>
+                        <td>Response Time</td>
+                        <td>Better</td>
+                        <td>Poorer</td>
+                    </tr>
+                    <tr>
+                        <td>Flexibility</td>
+                        <td>More flexible</td>
+                        <td>Less flexible</td>
+                    </tr>
+                    <tr>
+                        <td>Overhead</td>
+                        <td>Higher</td>
+                        <td>Lower</td>
+                    </tr>
+                    <tr>
+                        <td>Complexity</td>
+                        <td>More complex</td>
+                        <td>Simpler</td>
+                    </tr>
+                    <tr>
+                        <td>CPU Utilization</td>
+                        <td>Better</td>
+                        <td>May be poor</td>
+                    </tr>
+                    <tr>
+                        <td>Suitable For</td>
+                        <td>Time-sharing, Real-time</td>
+                        <td>Batch systems</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Starvation</h3>
+            <div class="definition">
+                Starvation is a situation where a process is ready to run but is never allocated CPU time because other processes with higher priority or shorter burst time keep arriving and getting executed.
+            </div>
+
+            <p>Starvation can occur in:</p>
+            <ul>
+                <li><strong>Priority Scheduling:</strong> Low priority processes may never execute if high priority processes keep arriving</li>
+                <li><strong>SJF Scheduling:</strong> Long processes may never execute if short processes keep arriving</li>
+            </ul>
+
+            <p>Effects of starvation:</p>
+            <ul>
+                <li>Process waits indefinitely</li>
+                <li>System resources are wasted</li>
+                <li>User dissatisfaction</li>
+                <li>Unfair treatment of processes</li>
+                <li>Decreased system throughput for starved processes</li>
+            </ul>
+
+            <h3>Aging</h3>
+            <div class="definition">
+                Aging is a technique used to prevent starvation by gradually increasing the priority of processes that wait in the system for a long time.
+            </div>
+
+            <p>How aging works:</p>
+            <ul>
+                <li>Each process is assigned an initial priority</li>
+                <li>As a process waits in the ready queue, its priority is periodically increased</li>
+                <li>After sufficient time, even a low priority process will have a high enough priority to be executed</li>
+                <li>Once the process executes, its priority may be reset</li>
+            </ul>
+
+            <p>Benefits of aging:</p>
+            <ul>
+                <li>Ensures all processes eventually get CPU time</li>
+                <li>Prevents indefinite postponement</li>
+                <li>Maintains the concept of priority while ensuring fairness</li>
+                <li>Simple to implement</li>
+                <li>Can be tuned by adjusting the rate of priority increase</li>
+            </ul>
+
+            <div class="important">
+                <strong>Remember for Exams:</strong>
+                <ul>
+                    <li>Starvation is the problem - processes waiting indefinitely</li>
+                    <li>Aging is the solution - gradually increasing priority of waiting processes</li>
+                    <li>Aging ensures eventual execution of all processes</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="exam" class="exam-focus">
+            <h2>9. Exam Focus Box</h2>
+
+            <h3>Important Definitions to Memorize</h3>
+            <ul>
+                <li><strong>Process:</strong> A program in execution that requires resources for task accomplishment</li>
+                <li><strong>PCB:</strong> Data structure containing all information needed to manage a process</li>
+                <li><strong>Context Switching:</strong> Process of saving and restoring state of a process for resumption</li>
+                <li><strong>Thread:</strong> Basic unit of CPU utilization sharing code and data with other threads</li>
+                <li><strong>CPU Scheduling:</strong> Selection of process from ready queue for CPU allocation</li>
+                <li><strong>Turnaround Time:</strong> Total time from submission to completion</li>
+                <li><strong>Waiting Time:</strong> Time spent waiting in ready queue</li>
+                <li><strong>Response Time:</strong> Time from submission to first response</li>
+                <li><strong>Starvation:</strong> Indefinite blocking of a process</li>
+                <li><strong>Aging:</strong> Gradual priority increase to prevent starvation</li>
+            </ul>
+
+            <h3>Frequently Asked AKTU Questions from Unit 2</h3>
+            <ul>
+                <li>Define process and differentiate between process and program</li>
+                <li>Explain process states with state transition diagram</li>
+                <li>What is PCB? Explain its contents and importance</li>
+                <li>Explain context switching with steps involved</li>
+                <li>Differentiate between process and thread</li>
+                <li>What are the advantages of multithreading?</li>
+                <li>Define CPU scheduling and explain scheduling criteria</li>
+                <li>Compare FCFS, SJF, Priority, and Round Robin scheduling</li>
+                <li>Explain convoy effect in FCFS scheduling</li>
+                <li>What is starvation? How is aging used to prevent it?</li>
+                <li>Differentiate between preemptive and non-preemptive scheduling</li>
+                <li>Explain Round Robin scheduling with advantages and disadvantages</li>
+                <li>What is the role of time quantum in Round Robin?</li>
+                <li>Compare SJF preemptive and non-preemptive scheduling</li>
+            </ul>
+
+            <h3>Keywords to Use in Answers</h3>
+            <ul>
+                <li>Active entity, passive entity</li>
+                <li>Multiprogramming, multitasking, time-sharing</li>
+                <li>Ready queue, waiting queue</li>
+                <li>Dispatch, preemption, interrupt</li>
+                <li>Lightweight process, heavyweight process</li>
+                <li>Resource sharing, communication overhead</li>
+                <li>CPU utilization, throughput</li>
+                <li>Average waiting time, average turnaround time</li>
+                <li>Convoy effect, starvation, aging</li>
+                <li>Time quantum, context switch overhead</li>
+                <li>Fair allocation, indefinite blocking</li>
+                <li>Optimal algorithm, minimal waiting time</li>
+            </ul>
+
+            <h3>Common Mistakes Students Make</h3>
+            <ul>
+                <li>Confusing process with program - remember process is active, program is passive</li>
+                <li>Not mentioning all five process states - New, Ready, Running, Waiting, Terminated</li>
+                <li>Forgetting that PCB is also called Task Control Block</li>
+                <li>Not explaining that context switching is overhead with no useful work</li>
+                <li>Confusing response time with turnaround time - response is first output, turnaround is completion</li>
+                <li>Thinking FCFS is always bad - mention it is simple and has no starvation</li>
+                <li>Not mentioning that SJF gives minimum average waiting time</li>
+                <li>Forgetting to explain aging as solution to starvation</li>
+                <li>Not relating time quantum size to performance in Round Robin</li>
+                <li>Missing the comparison tables - always good for marks</li>
+            </ul>
+
+            <h3>Answer Writing Tips</h3>
+            <ul>
+                <li>Always start with a clear definition</li>
+                <li>Use diagrams where possible (state diagrams, tables)</li>
+                <li>Mention both advantages and disadvantages when asked</li>
+                <li>Give examples to illustrate concepts</li>
+                <li>Use comparison tables for "differentiate" questions</li>
+                <li>Explain formulas where relevant (turnaround time, waiting time)</li>
+                <li>Conclude with importance or applications</li>
+                <li>Write in points for better readability</li>
+                <li>Underline important terms</li>
+                <li>Maintain neat handwriting and proper spacing</li>
+            </ul>
+
+            <h3>High-Weightage Topics</h3>
+            <ul>
+                <li>Process states and transitions - 7 marks</li>
+                <li>PCB and its contents - 7 marks</li>
+                <li>CPU scheduling algorithms comparison - 10 marks</li>
+                <li>Process vs Thread - 7 marks</li>
+                <li>Context switching - 5 marks</li>
+                <li>Scheduling criteria - 7 marks</li>
+                <li>Preemptive vs Non-preemptive - 5 marks</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>Prepared for AKTU B.Tech CSE – Operating System Unit 2: Process Management (View Only)</p>
+        <p>Study Well and Score Maximum Marks</p>
+    </footer>
+
+    <script>
+        window.onbeforeprint = function () {
+            alert("Printing is disabled. Please view the content on the website.");
+        };
+        
+        document.addEventListener("contextmenu", function(e) {
+            e.preventDefault();
+        });
+
+        document.addEventListener("keydown", function(e) {
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                alert("Printing is disabled. Please view the content on the website.");
+            }
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                alert("Saving is disabled. Please view the content on the website.");
+            }
+        });
+    </script>
+</body>
+</html>
+```

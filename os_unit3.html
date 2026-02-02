@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operating System – Unit 3 | Process Synchronization & Deadlocks | AKTU B.Tech CSE</title>
+    <style>
+        /* Fixed Home Button */
+.home-btn{
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    padding: 8px 14px;
+    background: #1e293b;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    z-index: 10000;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+
+.home-btn:hover{
+    background: #0f172a;
+}
+
+/* Smooth scroll */
+html{
+    scroll-behavior: smooth;
+}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #2c3e50;
+            padding: 20px;
+            position: relative;
+        }
+
+         body::after {
+            content: "operating system unit 3 • aktunotes.live";
+            position: fixed;
+            top: 40%;
+            left: 5%;
+            font-size: 24px;
+            color: rgba(0,0,0,0.05);
+            transform: rotate(-30deg);
+            pointer-events: none;
+            z-index: 9999;
+            width: 100%;
+            text-align: center;
+        }
+
+        @media print {
+            body {
+                display: none !important;
+            }
+        } 
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+
+        nav {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        nav h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        nav ul {
+            list-style: none;
+            columns: 2;
+            column-gap: 30px;
+        }
+
+        nav ul li {
+            margin: 10px 0;
+            break-inside: avoid;
+        }
+
+        nav ul li a {
+            color: #764ba2;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: block;
+            padding: 8px 12px;
+            border-radius: 5px;
+        }
+
+        nav ul li a:hover {
+            background: #f0f0f0;
+            color: #667eea;
+            transform: translateX(5px);
+        }
+
+        main {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        section {
+            margin-bottom: 50px;
+        }
+
+        section h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        section h3 {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        section h4 {
+            color: #555;
+            font-size: 1.2em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .definition {
+            background: #e8f4f8;
+            border-left: 5px solid #667eea;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+
+        .important {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .note {
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        table th, table td {
+            padding: 15px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        table tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        table tbody tr:hover {
+            background: #e8f4f8;
+        }
+
+        ul, ol {
+            margin: 15px 0 15px 40px;
+        }
+
+        ul li, ol li {
+            margin: 8px 0;
+        }
+
+        .exam-focus {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 40px;
+        }
+
+        .exam-focus h2 {
+            color: white;
+            border-bottom: 3px solid white;
+        }
+
+        .exam-focus h3 {
+            color: #fff3cd;
+            margin-top: 20px;
+        }
+
+        .exam-focus ul {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .exam-focus ul li::before {
+            content: "✓ ";
+            color: #fff3cd;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            main {
+                padding: 20px;
+            }
+
+            nav ul {
+                columns: 1;
+            }
+
+            body::after {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body id="top">
+  <a href="#top" class="home-btn">↑</a>
+    <header>
+        <h1>Operating System – Unit 3</h1>
+        <p>Process Synchronization & Deadlocks | AKTU B.Tech CSE – Exam Oriented Notes</p>
+    </header>
+
+    <nav>
+        <h2>Table of Contents</h2>
+        <ul>
+            <li><a href="#intro-sync">Introduction to Process Synchronization</a></li>
+            <li><a href="#critical-section">Critical Section Problem</a></li>
+            <li><a href="#sync-mechanisms">Synchronization Mechanisms</a></li>
+            <li><a href="#classical-problems">Classical Synchronization Problems</a></li>
+            <li><a href="#intro-deadlock">Introduction to Deadlocks</a></li>
+            <li><a href="#coffman">Coffman Conditions</a></li>
+            <li><a href="#handling">Methods for Handling Deadlocks</a></li>
+            <li><a href="#avoidance">Deadlock Avoidance</a></li>
+            <li><a href="#detection">Deadlock Detection and Recovery</a></li>
+            <li><a href="#exam">Exam Focus Box</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="intro-sync">
+            <h2>1. Introduction to Process Synchronization</h2>
+            
+            <h3>Need for Process Synchronization</h3>
+            <p>In a multiprogramming environment, multiple processes execute concurrently and may share resources such as memory, files, and I/O devices. Process synchronization is essential to ensure that concurrent processes cooperate correctly and maintain data consistency.</p>
+
+            <div class="definition">
+                Process synchronization is the coordination of concurrent processes to ensure that they access shared resources in a controlled manner, preventing race conditions and maintaining data integrity.
+            </div>
+
+            <p>The primary reasons for process synchronization include:</p>
+            <ul>
+                <li><strong>Data Consistency:</strong> Ensuring that shared data remains consistent when accessed by multiple processes simultaneously</li>
+                <li><strong>Resource Coordination:</strong> Managing access to limited resources to prevent conflicts and deadlocks</li>
+                <li><strong>Order of Execution:</strong> Controlling the sequence in which processes execute certain operations</li>
+                <li><strong>Preventing Race Conditions:</strong> Avoiding situations where the outcome depends on the unpredictable timing of process execution</li>
+                <li><strong>Mutual Exclusion:</strong> Ensuring that only one process accesses a critical resource at a time</li>
+            </ul>
+
+            <h3>Problems Caused by Concurrent Processes</h3>
+
+            <h4>1. Race Condition</h4>
+            <div class="definition">
+                A race condition occurs when multiple processes access and manipulate shared data concurrently, and the outcome depends on the particular order in which the accesses take place.
+            </div>
+
+            <p>Race conditions lead to unpredictable results and data inconsistency. For example, if two processes try to increment a shared counter simultaneously, the final value may be incorrect due to interleaved execution of read-modify-write operations.</p>
+
+            <h4>2. Data Inconsistency</h4>
+            <p>When multiple processes access shared data without proper synchronization, the data may become inconsistent. One process may read data while another is modifying it, leading to incorrect computations and unreliable results.</p>
+
+            <h4>3. Lost Updates</h4>
+            <p>When two processes read the same data, modify it, and write it back, one update may overwrite the other, causing the first update to be lost entirely.</p>
+
+            <h4>4. Deadlock</h4>
+            <p>Poor synchronization can lead to deadlock situations where processes wait indefinitely for resources held by each other, causing the system to halt.</p>
+
+            <h3>Critical Section Concept</h3>
+            <div class="definition">
+                The critical section is a segment of code where a process accesses shared resources such as shared variables, files, or data structures that must not be accessed by more than one process at a time.
+            </div>
+
+            <p>Each process has a critical section where it manipulates shared data. The critical section problem is to design a protocol that processes can use to cooperate in accessing shared resources without conflicts.</p>
+
+            <div class="important">
+                <strong>Key Point:</strong> The critical section must be protected to ensure that when one process is executing in its critical section, no other process is allowed to execute in its critical section for the same shared resource.
+            </div>
+        </section>
+
+        <section id="critical-section">
+            <h2>2. Critical Section Problem</h2>
+
+            <div class="definition">
+                The critical section problem is to design a protocol that processes can use to synchronize their activity and ensure that only one process executes in its critical section at any given time for a particular shared resource.
+            </div>
+
+            <h3>Structure of Critical Section</h3>
+            <p>A typical process structure for handling critical sections includes four sections:</p>
+
+            <ol>
+                <li><strong>Entry Section:</strong> Code that requests permission to enter the critical section</li>
+                <li><strong>Critical Section:</strong> Code segment where shared resources are accessed</li>
+                <li><strong>Exit Section:</strong> Code that signals completion of critical section execution</li>
+                <li><strong>Remainder Section:</strong> The rest of the code that does not access shared resources</li>
+            </ol>
+
+            <div class="note">
+                <strong>General Structure:</strong><br>
+                do {<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;[Entry Section]<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Critical Section<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;[Exit Section]<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Remainder Section<br>
+                } while (true);
+            </div>
+
+            <h3>Requirements for Critical Section Solution</h3>
+            <p>A solution to the critical section problem must satisfy three essential requirements:</p>
+
+            <h4>1. Mutual Exclusion</h4>
+            <div class="definition">
+                Mutual exclusion ensures that if a process is executing in its critical section, then no other process can execute in its critical section for the same shared resource.
+            </div>
+
+            <p>This is the most fundamental requirement. At any given time, at most one process should be allowed to execute in the critical section. This prevents concurrent access to shared resources and maintains data consistency.</p>
+
+            <div class="important">
+                <strong>Remember:</strong> Mutual exclusion guarantees exclusive access to shared resources, preventing race conditions and data corruption.
+            </div>
+
+            <h4>2. Progress</h4>
+            <div class="definition">
+                Progress ensures that if no process is executing in its critical section and some processes wish to enter their critical sections, then only those processes that are not executing in their remainder sections can participate in deciding which will enter its critical section next, and this selection cannot be postponed indefinitely.
+            </div>
+
+            <p>Key aspects of the progress requirement:</p>
+            <ul>
+                <li>The decision of which process enters the critical section next cannot be postponed indefinitely</li>
+                <li>Only processes that want to enter the critical section should participate in the decision</li>
+                <li>Processes not in the remainder section should not block other processes from entering</li>
+                <li>Prevents deadlock situations where no process can proceed</li>
+            </ul>
+
+            <h4>3. Bounded Waiting</h4>
+            <div class="definition">
+                Bounded waiting ensures that there exists a limit on the number of times other processes are allowed to enter their critical sections after a process has made a request to enter its critical section and before that request is granted.
+            </div>
+
+            <p>This requirement prevents starvation. It guarantees that every process gets a fair chance to execute its critical section and will not wait indefinitely. There is an upper bound on the waiting time.</p>
+
+            <div class="important">
+                <strong>Starvation Prevention:</strong> Bounded waiting ensures that no process waits forever to enter its critical section, providing fairness in resource allocation.
+            </div>
+
+            <h3>Summary of Requirements</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Requirement</th>
+                        <th>Purpose</th>
+                        <th>Ensures</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Mutual Exclusion</td>
+                        <td>Prevent concurrent access</td>
+                        <td>Only one process in critical section</td>
+                    </tr>
+                    <tr>
+                        <td>Progress</td>
+                        <td>Avoid deadlock</td>
+                        <td>Decision on entry is not postponed indefinitely</td>
+                    </tr>
+                    <tr>
+                        <td>Bounded Waiting</td>
+                        <td>Prevent starvation</td>
+                        <td>Limited waiting time for each process</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="sync-mechanisms">
+            <h2>3. Synchronization Mechanisms</h2>
+
+            <h3>Mutex (Mutual Exclusion Object)</h3>
+
+            <div class="definition">
+                A mutex is a synchronization primitive that provides mutual exclusion for accessing shared resources. It is a locking mechanism where only one process can acquire the mutex at a time.
+            </div>
+
+            <h4>Working of Mutex</h4>
+            <p>A mutex works like a binary lock with two states: locked and unlocked.</p>
+
+            <ul>
+                <li><strong>Lock Operation:</strong> Before entering the critical section, a process attempts to acquire the mutex. If the mutex is available (unlocked), the process locks it and enters the critical section. If the mutex is already locked by another process, the requesting process is blocked until the mutex becomes available.</li>
+                
+                <li><strong>Unlock Operation:</strong> After completing the critical section, the process releases the mutex by unlocking it, allowing other waiting processes to acquire it.</li>
+            </ul>
+
+            <p>Key characteristics of mutex:</p>
+            <ul>
+                <li>Binary in nature - can be either locked or unlocked</li>
+                <li>Ownership - the process that locks the mutex must unlock it</li>
+                <li>Used for protecting critical sections</li>
+                <li>Provides mutual exclusion guarantee</li>
+                <li>Simple and efficient for single resource protection</li>
+            </ul>
+
+            <h3>Semaphore</h3>
+
+            <div class="definition">
+                A semaphore is a synchronization tool that uses an integer variable to control access to shared resources. It provides a more general synchronization mechanism than mutex.
+            </div>
+
+            <p>A semaphore is accessed through two atomic operations:</p>
+
+            <h4>Semaphore Operations</h4>
+
+            <h5>1. Wait Operation (P operation or down operation)</h5>
+            <div class="note">
+                <strong>wait(S):</strong><br>
+                while (S <= 0);<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;// busy wait<br>
+                S--;
+            </div>
+
+            <p>The wait operation decrements the semaphore value. If the value becomes negative or zero (depending on implementation), the process is blocked until the semaphore value becomes positive.</p>
+
+            <h5>2. Signal Operation (V operation or up operation)</h5>
+            <div class="note">
+                <strong>signal(S):</strong><br>
+                S++;
+            </div>
+
+            <p>The signal operation increments the semaphore value. If processes are waiting, one of them is awakened and allowed to proceed.</p>
+
+            <h4>Types of Semaphores</h4>
+
+            <h5>1. Binary Semaphore (Mutex Semaphore)</h5>
+            <div class="definition">
+                A binary semaphore can have only two values: 0 and 1. It is similar to a mutex and provides mutual exclusion.
+            </div>
+
+            <p>Characteristics of binary semaphore:</p>
+            <ul>
+                <li>Value ranges from 0 to 1</li>
+                <li>Initially set to 1 (available)</li>
+                <li>When a process acquires it, value becomes 0 (unavailable)</li>
+                <li>When released, value becomes 1 again</li>
+                <li>Used for implementing mutual exclusion</li>
+                <li>Also called mutex semaphore</li>
+            </ul>
+
+            <h5>2. Counting Semaphore</h5>
+            <div class="definition">
+                A counting semaphore can have any non-negative integer value. It is used to control access to resources that have multiple instances.
+            </div>
+
+            <p>Characteristics of counting semaphore:</p>
+            <ul>
+                <li>Value can range from 0 to any positive integer</li>
+                <li>Initially set to the number of available resources</li>
+                <li>Each wait operation decrements the count</li>
+                <li>Each signal operation increments the count</li>
+                <li>Used for managing multiple instances of a resource</li>
+                <li>Allows multiple processes to access resources simultaneously (up to the limit)</li>
+            </ul>
+
+            <h3>Difference Between Mutex and Semaphore</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Mutex</th>
+                        <th>Semaphore</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Definition</td>
+                        <td>Locking mechanism</td>
+                        <td>Signaling mechanism</td>
+                    </tr>
+                    <tr>
+                        <td>Type</td>
+                        <td>Binary (locked/unlocked)</td>
+                        <td>Binary or Counting</td>
+                    </tr>
+                    <tr>
+                        <td>Value</td>
+                        <td>0 or 1</td>
+                        <td>0 to N (non-negative integer)</td>
+                    </tr>
+                    <tr>
+                        <td>Ownership</td>
+                        <td>Has ownership concept</td>
+                        <td>No ownership concept</td>
+                    </tr>
+                    <tr>
+                        <td>Release</td>
+                        <td>Only the process that locked can unlock</td>
+                        <td>Any process can perform signal operation</td>
+                    </tr>
+                    <tr>
+                        <td>Purpose</td>
+                        <td>Mutual exclusion only</td>
+                        <td>Mutual exclusion and synchronization</td>
+                    </tr>
+                    <tr>
+                        <td>Resource Management</td>
+                        <td>Single resource</td>
+                        <td>Single or multiple resources</td>
+                    </tr>
+                    <tr>
+                        <td>Complexity</td>
+                        <td>Simpler</td>
+                        <td>More flexible and complex</td>
+                    </tr>
+                    <tr>
+                        <td>Use Case</td>
+                        <td>Critical section protection</td>
+                        <td>Resource counting and process synchronization</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="important">
+                <strong>Key Difference for Exams:</strong> Mutex is a locking mechanism with ownership (only the locker can unlock), while semaphore is a signaling mechanism without ownership (any process can signal).
+            </div>
+        </section>
+
+        <section id="classical-problems">
+            <h2>4. Classical Synchronization Problems</h2>
+
+            <p>Classical synchronization problems are standard problems used to test and illustrate synchronization mechanisms. Understanding these problems helps in grasping fundamental concepts of process synchronization.</p>
+
+            <h3>1. Producer-Consumer Problem (Bounded Buffer Problem)</h3>
+
+            <div class="definition">
+                The Producer-Consumer problem involves two types of processes: producers that generate data and place it in a buffer, and consumers that remove data from the buffer. The challenge is to ensure proper synchronization when the buffer is full or empty.
+            </div>
+
+            <h4>Problem Description</h4>
+            <p>The scenario involves:</p>
+            <ul>
+                <li><strong>Producer Process:</strong> Produces items and places them in a shared buffer</li>
+                <li><strong>Consumer Process:</strong> Removes items from the buffer and consumes them</li>
+                <li><strong>Shared Buffer:</strong> A finite buffer with limited capacity</li>
+            </ul>
+
+            <h4>Challenges</h4>
+            <ul>
+                <li>Producer must wait if the buffer is full</li>
+                <li>Consumer must wait if the buffer is empty</li>
+                <li>Multiple producers and consumers should not corrupt the buffer</li>
+                <li>Maintain count of items in the buffer correctly</li>
+            </ul>
+
+            <h4>Solution Approach</h4>
+            <p>The solution uses three semaphores:</p>
+            <ul>
+                <li><strong>mutex:</strong> Binary semaphore for mutual exclusion (initialized to 1)</li>
+                <li><strong>empty:</strong> Counting semaphore tracking empty slots (initialized to buffer size)</li>
+                <li><strong>full:</strong> Counting semaphore tracking filled slots (initialized to 0)</li>
+            </ul>
+
+            <div class="note">
+                <strong>Producer Logic:</strong> wait(empty) → wait(mutex) → Add item to buffer → signal(mutex) → signal(full)<br><br>
+                <strong>Consumer Logic:</strong> wait(full) → wait(mutex) → Remove item from buffer → signal(mutex) → signal(empty)
+            </div>
+
+            <h3>2. Readers-Writers Problem</h3>
+
+            <div class="definition">
+                The Readers-Writers problem deals with a shared database that can be accessed by multiple readers or writers. Multiple readers can read simultaneously, but writers require exclusive access.
+            </div>
+
+            <h4>Problem Description</h4>
+            <p>The scenario involves:</p>
+            <ul>
+                <li><strong>Readers:</strong> Processes that only read from the shared database</li>
+                <li><strong>Writers:</strong> Processes that modify the shared database</li>
+                <li><strong>Shared Database:</strong> Common data structure accessed by both types</li>
+            </ul>
+
+            <h4>Constraints</h4>
+            <ul>
+                <li>Multiple readers can read simultaneously without problems</li>
+                <li>Only one writer can write at a time</li>
+                <li>No reader can read while a writer is writing</li>
+                <li>No writer can write while any reader is reading</li>
+            </ul>
+
+            <h4>Variants</h4>
+            <p>There are two main variants:</p>
+            <ul>
+                <li><strong>First Readers-Writers Problem:</strong> Readers have priority. No reader should wait unless a writer has already obtained permission to write. Writers may starve.</li>
+                <li><strong>Second Readers-Writers Problem:</strong> Writers have priority. Once a writer is ready, it performs its write as soon as possible. Readers may starve.</li>
+            </ul>
+
+            <h4>Solution Components</h4>
+            <ul>
+                <li><strong>mutex:</strong> Binary semaphore for protecting reader count (initialized to 1)</li>
+                <li><strong>wrt:</strong> Binary semaphore for writer mutual exclusion (initialized to 1)</li>
+                <li><strong>readcount:</strong> Integer variable tracking number of active readers</li>
+            </ul>
+
+            <div class="important">
+                <strong>Key Insight:</strong> The first reader locks the writers out, and the last reader unlocks for writers. This allows multiple readers to read concurrently.
+            </div>
+
+            <h3>3. Dining Philosophers Problem</h3>
+
+            <div class="definition">
+                The Dining Philosophers problem is a classic synchronization problem involving resource allocation and deadlock avoidance. It illustrates the challenges of allocating multiple resources among multiple processes without deadlock and starvation.
+            </div>
+
+            <h4>Problem Description</h4>
+            <p>The scenario involves:</p>
+            <ul>
+                <li>Five philosophers sitting around a circular table</li>
+                <li>Five chopsticks placed between adjacent philosophers</li>
+                <li>Each philosopher alternates between thinking and eating</li>
+                <li>A philosopher needs two chopsticks (left and right) to eat</li>
+                <li>After eating, the philosopher puts down both chopsticks and returns to thinking</li>
+            </ul>
+
+            <h4>Challenges</h4>
+            <ul>
+                <li><strong>Deadlock:</strong> All philosophers pick up their left chopstick simultaneously and wait forever for the right chopstick</li>
+                <li><strong>Starvation:</strong> Some philosophers may never get to eat if others monopolize chopsticks</li>
+                <li><strong>Mutual Exclusion:</strong> Each chopstick can be held by only one philosopher at a time</li>
+            </ul>
+
+            <h4>Possible Solutions</h4>
+            <ul>
+                <li><strong>Allow at most four philosophers:</strong> Ensure at least one philosopher can always acquire both chopsticks</li>
+                <li><strong>Asymmetric solution:</strong> Odd philosophers pick left first, even philosophers pick right first</li>
+                <li><strong>Critical section protection:</strong> Allow a philosopher to pick chopsticks only if both are available</li>
+                <li><strong>Resource ordering:</strong> Assign numbers to chopsticks and always pick lower-numbered chopstick first</li>
+            </ul>
+
+            <div class="important">
+                <strong>Learning Objective:</strong> This problem teaches resource allocation strategies, deadlock prevention techniques, and the importance of careful synchronization in concurrent systems.
+            </div>
+
+            <h3>Importance of Classical Problems</h3>
+            <p>These classical problems are frequently asked in AKTU examinations because they:</p>
+            <ul>
+                <li>Demonstrate fundamental synchronization concepts</li>
+                <li>Illustrate real-world scenarios requiring coordination</li>
+                <li>Show practical applications of semaphores and mutex</li>
+                <li>Highlight common pitfalls like deadlock and starvation</li>
+                <li>Provide framework for solving custom synchronization problems</li>
+            </ul>
+        </section>
+
+        <section id="intro-deadlock">
+            <h2>5. Introduction to Deadlocks</h2>
+
+            <div class="definition">
+                A deadlock is a situation in which a set of processes is blocked because each process is holding a resource and waiting for another resource that is being held by some other process in the set. No process can proceed, resulting in a permanent blocking state.
+            </div>
+
+            <h3>System Model for Deadlock</h3>
+            <p>Understanding deadlock requires understanding the system model:</p>
+
+            <h4>Resources</h4>
+            <ul>
+                <li><strong>Resource Types:</strong> R1, R2, ..., Rm (CPU cycles, memory space, I/O devices, files, etc.)</li>
+                <li><strong>Resource Instances:</strong> Each resource type may have multiple identical instances</li>
+                <li><strong>Resource Usage:</strong> A process must request a resource before using it and must release it after use</li>
+            </ul>
+
+            <h4>Process-Resource Interaction</h4>
+            <p>A process interacts with resources through the following sequence:</p>
+            <ol>
+                <li><strong>Request:</strong> Process requests the resource. If the request cannot be granted immediately, the process must wait</li>
+                <li><strong>Use:</strong> Process uses the resource and performs operations on it</li>
+                <li><strong>Release:</strong> Process releases the resource, making it available for other processes</li>
+            </ol>
+
+            <h3>Characteristics of Deadlock</h3>
+            <ul>
+                <li>Deadlock involves a circular waiting pattern</li>
+                <li>All processes in the deadlock set are blocked permanently</li>
+                <li>System resources are underutilized due to blocking</li>
+                <li>The system cannot recover automatically without external intervention</li>
+                <li>Deadlock is different from starvation (indefinite postponement)</li>
+            </ul>
+
+            <h3>Examples of Deadlock Situations</h3>
+
+            <h4>Example 1: Two Processes, Two Resources</h4>
+            <div class="note">
+                <strong>Scenario:</strong><br>
+                - Process P1 holds Resource R1 and requests Resource R2<br>
+                - Process P2 holds Resource R2 and requests Resource R1<br>
+                - Both processes wait indefinitely for each other<br>
+                <strong>Result:</strong> Deadlock
+            </div>
+
+            <h4>Example 2: Traffic Intersection Deadlock</h4>
+            <p>Consider a four-way intersection where:</p>
+            <ul>
+                <li>Four cars arrive simultaneously from four different directions</li>
+                <li>Each car occupies one section of the intersection</li>
+                <li>Each car needs to move through the adjacent section occupied by another car</li>
+                <li>No car can move forward, resulting in gridlock (deadlock)</li>
+            </ul>
+
+            <h4>Example 3: Database Transaction Deadlock</h4>
+            <div class="note">
+                <strong>Scenario:</strong><br>
+                - Transaction T1 locks Record A and waits for Record B<br>
+                - Transaction T2 locks Record B and waits for Record A<br>
+                - Neither transaction can proceed<br>
+                <strong>Result:</strong> Deadlock in database system
+            </div>
+
+            <h4>Example 4: Memory Allocation Deadlock</h4>
+            <p>Two processes each holding some memory blocks while requesting additional blocks held by the other process, creating a circular wait.</p>
+
+            <div class="important">
+                <strong>Remember:</strong> Deadlock is characterized by circular waiting where each process holds resources that another process needs, creating an unbreakable cycle of dependencies.
+            </div>
+
+            <h3>Impact of Deadlock</h3>
+            <ul>
+                <li><strong>System Performance:</strong> Degraded throughput and resource utilization</li>
+                <li><strong>User Experience:</strong> Unresponsive applications and system hangs</li>
+                <li><strong>Data Integrity:</strong> Risk of data corruption if recovery is not handled properly</li>
+                <li><strong>Economic Cost:</strong> Lost productivity and potential system restarts</li>
+            </ul>
+        </section>
+
+        <section id="coffman">
+            <h2>6. Coffman Conditions (Necessary Conditions for Deadlock)</h2>
+
+            <div class="definition">
+                The Coffman Conditions are four necessary conditions that must hold simultaneously for a deadlock to occur. These conditions were identified by E.G. Coffman in 1971 and form the foundation for understanding and preventing deadlocks.
+            </div>
+
+            <div class="important">
+                <strong>Critical Concept:</strong> All four conditions must be present simultaneously for a deadlock to exist. If any one condition is prevented, deadlock cannot occur.
+            </div>
+
+            <h3>The Four Coffman Conditions</h3>
+
+            <h4>1. Mutual Exclusion</h4>
+            <div class="definition">
+                At least one resource must be held in a non-shareable mode. Only one process can use the resource at a time. If another process requests that resource, the requesting process must wait until the resource is released.
+            </div>
+
+            <p>Explanation:</p>
+            <ul>
+                <li>Resources cannot be simultaneously shared by multiple processes</li>
+                <li>At least one resource must require exclusive access</li>
+                <li>Common examples: printers, disk drives, database records with write locks</li>
+                <li>If all resources were shareable, deadlock could not occur</li>
+            </ul>
+
+            <p>Example: A printer can be used by only one process at a time. If Process P1 is using the printer, Process P2 must wait until P1 releases it.</p>
+
+            <h4>2. Hold and Wait</h4>
+            <div class="definition">
+                A process holding at least one resource is waiting to acquire additional resources that are currently being held by other processes. The process does not release its currently held resources while waiting.
+            </div>
+
+            <p>Explanation:</p>
+            <ul>
+                <li>Processes retain resources they already have while requesting new ones</li>
+                <li>Partial allocation is allowed - a process can hold some resources while waiting for others</li>
+                <li>The held resources remain unavailable to other processes</li>
+                <li>Creates potential for circular dependencies</li>
+            </ul>
+
+            <p>Example: Process P1 holds Resource R1 and requests Resource R2, while Process P2 holds Resource R2 and requests Resource R1. Both processes hold and wait.</p>
+
+            <h4>3. No Preemption</h4>
+            <div class="definition">
+                Resources cannot be forcibly taken away from a process. A resource can only be released voluntarily by the process holding it, after that process has completed its task.
+            </div>
+
+            <p>Explanation:</p>
+            <ul>
+                <li>The operating system cannot force a process to release resources</li>
+                <li>Resources must be released explicitly by the holding process</li>
+                <li>Prevents resource reclamation by the system</li>
+                <li>Common for resources that cannot be saved and restored easily</li>
+            </ul>
+
+            <p>Example: If Process P1 is holding a tape drive, the operating system cannot take it away forcibly. P1 must release it voluntarily when done.</p>
+
+            <div class="note">
+                <strong>Note:</strong> Some resources like CPU and memory can be preempted, but resources like printers and tape drives typically cannot be preempted.
+            </div>
+
+            <h4>4. Circular Wait</h4>
+            <div class="definition">
+                There exists a circular chain of two or more processes, where each process holds one or more resources that are being requested by the next process in the chain.
+            </div>
+
+            <p>Explanation:</p>
+            <ul>
+                <li>A closed chain of processes exists where each process holds resources needed by the next</li>
+                <li>Forms a cycle: P1 → P2 → P3 → ... → Pn → P1</li>
+                <li>Each arrow represents "waiting for a resource held by"</li>
+                <li>The cycle creates an unbreakable waiting loop</li>
+            </ul>
+
+            <p>Example of circular wait:</p>
+            <ul>
+                <li>Process P1 holds R1 and waits for R2</li>
+                <li>Process P2 holds R2 and waits for R3</li>
+                <li>Process P3 holds R3 and waits for R1</li>
+                <li>This forms a cycle: P1 → P2 → P3 → P1</li>
+            </ul>
+
+            <h3>Summary of Coffman Conditions</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Condition</th>
+                        <th>Description</th>
+                        <th>Key Characteristic</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Mutual Exclusion</td>
+                        <td>Resources cannot be shared</td>
+                        <td>Exclusive access required</td>
+                    </tr>
+                    <tr>
+                        <td>Hold and Wait</td>
+                        <td>Holding resources while waiting for more</td>
+                        <td>Partial allocation allowed</td>
+                    </tr>
+                    <tr>
+                        <td>No Preemption</td>
+                        <td>Resources cannot be forcibly taken</td>
+                        <td>Voluntary release only</td>
+                    </tr>
+                    <tr>
+                        <td>Circular Wait</td>
+                        <td>Circular chain of waiting processes</td>
+                        <td>Cyclic dependency exists</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="important">
+                <strong>Exam Strategy:</strong> When asked about deadlock conditions, always mention all four Coffman conditions with clear explanations and examples. This is a high-scoring topic in AKTU exams.
+            </div>
+
+            <h3>Relationship Between Conditions</h3>
+            <p>Understanding the relationship between these conditions is crucial:</p>
+            <ul>
+                <li>The first three conditions are necessary but not sufficient for deadlock</li>
+                <li>Circular wait implies hold and wait</li>
+                <li>All four conditions must exist simultaneously for deadlock to occur</li>
+                <li>Breaking any one condition prevents deadlock</li>
+                <li>Deadlock prevention strategies target one or more of these conditions</li>
+            </ul>
+        </section>
+
+        <section id="handling">
+            <h2>7. Methods for Handling Deadlocks</h2>
+
+            <p>There are four primary approaches to handling deadlocks in operating systems. Each method has its own advantages, disadvantages, and suitable application scenarios.</p>
+
+            <h3>1. Deadlock Prevention</h3>
+
+            <div class="definition">
+                Deadlock prevention involves designing the system in such a way that at least one of the four Coffman conditions cannot hold, thereby ensuring that deadlock can never occur.
+            </div>
+
+            <h4>Strategies for Prevention</h4>
+            <ul>
+                <li><strong>Preventing Mutual Exclusion:</strong> Make resources shareable when possible. However, this is not feasible for inherently non-shareable resources like printers.</li>
+                
+                <li><strong>Preventing Hold and Wait:</strong> 
+                    <ul>
+                        <li>Require processes to request all resources at once before execution begins</li>
+                        <li>Allow a process to request resources only when it has none</li>
+                        <li>Disadvantage: Low resource utilization and possible starvation</li>
+                    </ul>
+                </li>
+                
+                <li><strong>Preventing No Preemption:</strong>
+                    <ul>
+                        <li>If a process requests a resource that cannot be immediately allocated, it must release all currently held resources</li>
+                        <li>Preempt resources from waiting processes</li>
+                        <li>Suitable only for resources whose state can be saved and restored (like CPU, memory)</li>
+                    </ul>
+                </li>
+                
+                <li><strong>Preventing Circular Wait:</strong>
+                    <ul>
+                        <li>Impose a total ordering on all resource types</li>
+                        <li>Require that each process requests resources in increasing order of enumeration</li>
+                        <li>Most practical prevention method</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <div class="note">
+                <strong>Advantage:</strong> Deadlock cannot occur<br>
+                <strong>Disadvantage:</strong> Low resource utilization, reduced system throughput, may cause starvation
+            </div>
+
+            <h3>2. Deadlock Avoidance</h3>
+
+            <div class="definition">
+                Deadlock avoidance requires the operating system to have additional information about which resources a process will request and use during its lifetime. The system dynamically examines resource allocation states to ensure circular wait can never exist.
+            </div>
+
+            <h4>Key Concepts</h4>
+            <ul>
+                <li>Requires advance information about maximum resource needs</li>
+                <li>System examines resource allocation state before granting requests</li>
+                <li>Only grants requests that keep the system in a safe state</li>
+                <li>Uses algorithms like Banker's Algorithm</li>
+            </ul>
+
+            <div class="note">
+                <strong>Advantage:</strong> Less restrictive than prevention, better resource utilization<br>
+                <strong>Disadvantage:</strong> Requires advance knowledge of resource needs, overhead of safety checks
+            </div>
+
+            <h3>3. Deadlock Detection</h3>
+
+            <div class="definition">
+                Deadlock detection allows the system to enter a deadlocked state. The system periodically runs an algorithm to detect whether a deadlock has occurred by examining the current resource allocation state.
+            </div>
+
+            <h4>Detection Approach</h4>
+            <ul>
+                <li>Maintain resource allocation graphs or matrices</li>
+                <li>Periodically invoke detection algorithm to check for cycles</li>
+                <li>Detection frequency depends on:
+                    <ul>
+                        <li>How often deadlock is likely to occur</li>
+                        <li>How many processes will be affected</li>
+                    </ul>
+                </li>
+                <li>If deadlock is detected, invoke recovery mechanism</li>
+            </ul>
+
+            <div class="note">
+                <strong>Advantage:</strong> No restrictions on resource requests, no need for advance information<br>
+                <strong>Disadvantage:</strong> Overhead of detection algorithm, requires recovery mechanism
+            </div>
+
+            <h3>4. Deadlock Recovery</h3>
+
+            <div class="definition">
+                Deadlock recovery involves breaking the deadlock once it has been detected. The system takes action to recover from the deadlocked state and allow processes to proceed.
+            </div>
+
+            <h4>Recovery Methods</h4>
+            <ul>
+                <li><strong>Process Termination:</strong>
+                    <ul>
+                        <li>Abort all deadlocked processes</li>
+                        <li>Abort one process at a time until deadlock is eliminated</li>
+                    </ul>
+                </li>
+                
+                <li><strong>Resource Preemption:</strong>
+                    <ul>
+                        <li>Select a victim process and preempt its resources</li>
+                        <li>Rollback the victim to a safe state</li>
+                        <li>Restart the victim process</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <div class="note">
+                <strong>Advantage:</strong> Allows maximum resource utilization until deadlock occurs<br>
+                <strong>Disadvantage:</strong> Potential data loss, overhead of recovery, possible starvation
+            </div>
+
+            <h3>Comparison of Deadlock Handling Methods</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>When Applied</th>
+                        <th>Resource Utilization</th>
+                        <th>Complexity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Prevention</td>
+                        <td>Design time</td>
+                        <td>Low</td>
+                        <td>Low</td>
+                    </tr>
+                    <tr>
+                        <td>Avoidance</td>
+                        <td>Runtime (before allocation)</td>
+                        <td>Medium</td>
+                        <td>Medium</td>
+                    </tr>
+                    <tr>
+                        <td>Detection</td>
+                        <td>Runtime (periodic checks)</td>
+                        <td>High</td>
+                        <td>Medium</td>
+                    </tr>
+                    <tr>
+                        <td>Recovery</td>
+                        <td>After deadlock detected</td>
+                        <td>High</td>
+                        <td>High</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="important">
+                <strong>Practical Approach:</strong> Most modern operating systems use a combination approach:
+                <ul>
+                    <li>Prevention for some resource types</li>
+                    <li>Avoidance for critical resources</li>
+                    <li>Detection and recovery for less critical resources</li>
+                    <li>Ignore deadlock (ostrich algorithm) for rare cases</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="avoidance">
+            <h2>8. Deadlock Avoidance</h2>
+
+            <div class="definition">
+                Deadlock avoidance is a dynamic approach where the system examines the resource allocation state before granting a request to ensure that the allocation will not lead to a deadlock. The system only grants requests that keep it in a safe state.
+            </div>
+
+            <h3>Safe State</h3>
+
+            <div class="definition">
+                A state is safe if the system can allocate resources to each process in some order and still avoid deadlock. In a safe state, there exists a safe sequence of process execution where all processes can complete without entering a deadlock.
+            </div>
+
+            <h4>Characteristics of Safe State</h4>
+            <ul>
+                <li>System can find at least one safe sequence of process execution</li>
+                <li>All processes can obtain their maximum resource requirements and complete</li>
+                <li>Resources released by completed processes can be used by remaining processes</li>
+                <li>Safe state guarantees no deadlock will occur</li>
+                <li>Not all safe states guarantee immediate completion of all processes</li>
+            </ul>
+
+            <div class="note">
+                <strong>Safe Sequence:</strong> A sequence of processes P1, P2, ..., Pn is safe if for each Pi, the resources that Pi can still request can be satisfied by currently available resources plus resources held by all Pj where j < i.
+            </div>
+
+            <h3>Unsafe State</h3>
+
+            <div class="definition">
+                A state is unsafe if the system cannot guarantee that all processes will be able to complete their execution. In an unsafe state, there is a possibility (but not certainty) that deadlock may occur.
+            </div>
+
+            <h4>Characteristics of Unsafe State</h4>
+            <ul>
+                <li>No safe sequence exists for all processes to complete</li>
+                <li>System may or may not enter deadlock (uncertain)</li>
+                <li>Deadlock is possible but not inevitable</li>
+                <li>System should avoid entering unsafe states</li>
+            </ul>
+
+            <div class="important">
+                <strong>Key Relationship:</strong>
+                <ul>
+                    <li>Safe State → No Deadlock (guaranteed)</li>
+                    <li>Unsafe State → Deadlock Possible (not guaranteed)</li>
+                    <li>All safe states are deadlock-free</li>
+                    <li>Not all unsafe states lead to deadlock</li>
+                </ul>
+            </div>
+
+            <h3>Resource Allocation Graph (RAG)</h3>
+
+            <div class="definition">
+                A Resource Allocation Graph is a directed graph used to represent the state of resource allocation in the system. It helps in detecting potential deadlocks and analyzing safe/unsafe states.
+            </div>
+
+            <h4>Components of RAG</h4>
+            <ul>
+                <li><strong>Vertices:</strong>
+                    <ul>
+                        <li>Process vertices (represented as circles)</li>
+                        <li>Resource vertices (represented as rectangles)</li>
+                    </ul>
+                </li>
+                
+                <li><strong>Edges:</strong>
+                    <ul>
+                        <li>Request edge: Directed from process to resource (process requesting resource)</li>
+                        <li>Assignment edge: Directed from resource to process (resource allocated to process)</li>
+                        <li>Claim edge: Dashed edge indicating future requests (used in avoidance)</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h4>RAG Analysis</h4>
+            <ul>
+                <li>If graph contains no cycles → No deadlock</li>
+                <li>If graph contains cycles:
+                    <ul>
+                        <li>With single instance per resource type → Deadlock exists</li>
+                        <li>With multiple instances per resource type → Deadlock may or may not exist</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>Banker's Algorithm</h3>
+
+            <div class="definition">
+                Banker's Algorithm is a deadlock avoidance algorithm developed by Edsger Dijkstra. It is named after the banking system where bankers ensure they never allocate cash in a way that prevents satisfying all customers' needs.
+            </div>
+
+            <h4>Concept</h4>
+            <p>The Banker's Algorithm works on the principle:</p>
+            <ul>
+                <li>When a process requests resources, the system checks if allocation would leave it in a safe state</li>
+                <li>If safe, the request is granted</li>
+                <li>If unsafe, the request is denied and the process must wait</li>
+                <li>System maintains information about available resources, allocated resources, and maximum needs</li>
+            </ul>
+
+            <h4>Data Structures Used</h4>
+            <p>For n processes and m resource types:</p>
+            <ul>
+                <li><strong>Available:</strong> Vector of length m indicating available instances of each resource</li>
+                <li><strong>Max:</strong> n × m matrix defining maximum demand of each process</li>
+                <li><strong>Allocation:</strong> n × m matrix defining resources currently allocated to each process</li>
+                <li><strong>Need:</strong> n × m matrix indicating remaining resource needs (Need = Max - Allocation)</li>
+            </ul>
+
+            <h4>Steps Involved in Banker's Algorithm</h4>
+
+            <h5>Safety Algorithm</h5>
+            <ol>
+                <li>Initialize Work vector = Available and Finish vector with all false values</li>
+                <li>Find a process Pi such that:
+                    <ul>
+                        <li>Finish[i] = false</li>
+                        <li>Need[i] ≤ Work</li>
+                    </ul>
+                </li>
+                <li>If such process exists:
+                    <ul>
+                        <li>Work = Work + Allocation[i]</li>
+                        <li>Finish[i] = true</li>
+                        <li>Go to step 2</li>
+                    </ul>
+                </li>
+                <li>If all Finish[i] = true, the state is safe; otherwise unsafe</li>
+            </ol>
+
+            <h5>Resource Request Algorithm</h5>
+            <ol>
+                <li>Check if Request ≤ Need; if not, raise error (exceeds maximum claim)</li>
+                <li>Check if Request ≤ Available; if not, process must wait</li>
+                <li>Pretend to allocate resources:
+                    <ul>
+                        <li>Available = Available - Request</li>
+                        <li>Allocation = Allocation + Request</li>
+                        <li>Need = Need - Request</li>
+                    </ul>
+                </li>
+                <li>Run safety algorithm on the new state</li>
+                <li>If safe, grant the request; if unsafe, restore the original state and deny request</li>
+            </ol>
+
+            <h4>Importance of Banker's Algorithm</h4>
+            <ul>
+                <li>Guarantees deadlock-free operation when properly implemented</li>
+                <li>Allows better resource utilization than prevention methods</li>
+                <li>Provides theoretical foundation for deadlock avoidance</li>
+                <li>Used in banking, database systems, and resource management</li>
+            </ul>
+
+            <h4>Limitations of Banker's Algorithm</h4>
+            <ul>
+                <li>Requires processes to declare maximum resource needs in advance</li>
+                <li>Number of processes and resources must be fixed</li>
+                <li>Overhead of checking safety for each request</li>
+                <li>Not practical for systems where resource needs change dynamically</li>
+                <li>Processes may not know their maximum needs beforehand</li>
+            </ul>
+
+            <div class="important">
+                <strong>Exam Focus:</strong> Banker's Algorithm is a high-scoring topic. Remember:
+                <ul>
+                    <li>It ensures the system remains in a safe state</li>
+                    <li>Uses Safety Algorithm to check state after allocation</li>
+                    <li>Request granted only if resulting state is safe</li>
+                    <li>Key formulas: Need = Max - Allocation</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="detection">
+            <h2>9. Deadlock Detection and Recovery</h2>
+
+            <h3>Deadlock Detection</h3>
+
+            <div class="definition">
+                Deadlock detection allows the system to enter a deadlocked state. The operating system periodically runs a detection algorithm to determine if a deadlock has occurred by examining the current resource allocation and request state.
+            </div>
+
+            <h4>Detection Methods</h4>
+
+            <h5>1. Single Instance of Each Resource Type</h5>
+            <p>Use Resource Allocation Graph (RAG) and check for cycles:</p>
+            <ul>
+                <li>Maintain a wait-for graph (simplified RAG)</li>
+                <li>Wait-for graph contains only process nodes</li>
+                <li>Edge Pi → Pj means Pi is waiting for Pj to release a resource</li>
+                <li>Deadlock exists if and only if wait-for graph contains a cycle</li>
+                <li>Cycle detection algorithms can be run periodically</li>
+            </ul>
+
+            <h5>2. Multiple Instances of Each Resource Type</h5>
+            <p>Use an algorithm similar to Banker's Algorithm:</p>
+            <ul>
+                <li>Maintain Available, Allocation, and Request matrices</li>
+                <li>Try to find a sequence where all processes can finish</li>
+                <li>If no such sequence exists, deadlock is detected</li>
+                <li>More complex than single-instance detection</li>
+            </ul>
+
+            <h4>When to Invoke Detection Algorithm</h4>
+            <p>The frequency of invoking the detection algorithm depends on:</p>
+            <ul>
+                <li><strong>Frequency of Deadlock:</strong> How often deadlock is likely to occur</li>
+                <li><strong>Number of Processes Affected:</strong> How many processes will be involved when deadlock occurs</li>
+                <li><strong>Options:</strong>
+                    <ul>
+                        <li>Invoke every time a request cannot be granted immediately</li>
+                        <li>Invoke at periodic intervals (hourly, daily)</li>
+                        <li>Invoke when CPU utilization drops below threshold</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <div class="note">
+                <strong>Trade-off:</strong> More frequent detection means earlier detection but higher overhead. Less frequent detection means lower overhead but longer time in deadlocked state.
+            </div>
+
+            <h3>Deadlock Recovery</h3>
+
+            <div class="definition">
+                Deadlock recovery is the process of breaking a detected deadlock and restoring the system to a normal operating state. Recovery techniques involve either terminating processes or preempting resources.
+            </div>
+
+            <h4>Recovery Technique 1: Process Termination</h4>
+
+            <p>Process termination involves aborting one or more processes to break the deadlock cycle.</p>
+
+            <h5>Termination Strategies</h5>
+
+            <p><strong>A. Abort All Deadlocked Processes</strong></p>
+            <ul>
+                <li>Simplest approach - terminates all processes in the deadlock cycle</li>
+                <li>Definitely breaks the deadlock</li>
+                <li>High cost - all partial computations are lost</li>
+                <li>All affected processes must restart from beginning</li>
+                <li>May cause significant work loss</li>
+            </ul>
+
+            <p><strong>B. Abort One Process at a Time</strong></p>
+            <ul>
+                <li>Terminate processes one by one until deadlock is eliminated</li>
+                <li>After each termination, run detection algorithm to check if deadlock persists</li>
+                <li>Continues until deadlock cycle is broken</li>
+                <li>Lower cost than aborting all processes</li>
+                <li>Higher overhead due to repeated detection checks</li>
+            </ul>
+
+            <h5>Process Selection Criteria</h5>
+            <p>When choosing which process to terminate, consider:</p>
+            <ul>
+                <li><strong>Priority:</strong> Terminate lower priority processes first</li>
+                <li><strong>Computation Time:</strong> How long the process has been running - prefer younger processes</li>
+                <li><strong>Resources Used:</strong> How many and what type of resources the process is holding</li>
+                <li><strong>Resources Needed:</strong> Resources needed to complete - prefer processes needing more</li>
+                <li><strong>Number of Processes to Terminate:</strong> Minimize total number of terminations</li>
+                <li><strong>Interactive vs Batch:</strong> Prefer terminating batch processes over interactive</li>
+            </ul>
+
+            <div class="important">
+                <strong>Goal:</strong> Minimize the cost of recovery by selecting the victim process that causes minimum disruption.
+            </div>
+
+            <h4>Recovery Technique 2: Resource Preemption</h4>
+
+            <p>Resource preemption involves forcibly taking resources from processes and giving them to other processes to break the deadlock.</p>
+
+            <h5>Steps in Resource Preemption</h5>
+
+            <p><strong>1. Selecting a Victim</strong></p>
+            <ul>
+                <li>Choose which resources and processes to preempt</li>
+                <li>Minimize cost of preemption</li>
+                <li>Consider same factors as process termination</li>
+                <li>Select processes that can be rolled back and restarted</li>
+            </ul>
+
+            <p><strong>2. Rollback</strong></p>
+            <ul>
+                <li>Return the process to a safe state where it can be restarted</li>
+                <li>Two approaches:
+                    <ul>
+                        <li><strong>Total Rollback:</strong> Abort the process and restart it from beginning</li>
+                        <li><strong>Partial Rollback:</strong> Roll back process to a checkpoint before resource acquisition</li>
+                    </ul>
+                </li>
+                <li>Requires checkpointing mechanism to save process state periodically</li>
+                <li>More effective rollback requires additional overhead for maintaining checkpoints</li>
+            </ul>
+
+            <p><strong>3. Starvation Prevention</strong></p>
+            <ul>
+                <li>Ensure same process is not always selected as victim</li>
+                <li>Include number of rollbacks in cost factor</li>
+                <li>Limit the number of times a process can be preempted</li>
+                <li>Use aging technique - increase priority with each preemption</li>
+                <li>Guarantee that process will eventually complete</li>
+            </ul>
+
+            <h5>Challenges in Resource Preemption</h5>
+            <ul>
+                <li>Not all resources can be easily preempted (e.g., printers mid-job)</li>
+                <li>State information must be saved and restored accurately</li>
+                <li>Overhead of checkpointing and rollback</li>
+                <li>Potential for starvation if same process repeatedly preempted</li>
+                <li>Complexity in maintaining system consistency</li>
+            </ul>
+
+            <h3>Comparison of Recovery Techniques</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Process Termination</th>
+                        <th>Resource Preemption</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Complexity</td>
+                        <td>Simpler</td>
+                        <td>More complex</td>
+                    </tr>
+                    <tr>
+                        <td>Cost</td>
+                        <td>High (lost computation)</td>
+                        <td>Lower (partial rollback possible)</td>
+                    </tr>
+                    <tr>
+                        <td>Implementation</td>
+                        <td>Easy</td>
+                        <td>Requires checkpointing mechanism</td>
+                    </tr>
+                    <tr>
+                        <td>Resource Recovery</td>
+                        <td>Immediate</td>
+                        <td>May require state saving</td>
+                    </tr>
+                    <tr>
+                        <td>Applicability</td>
+                        <td>All processes</td>
+                        <td>Only preemptible resources</td>
+                    </tr>
+                    <tr>
+                        <td>Starvation Risk</td>
+                        <td>Moderate</td>
+                        <td>Higher (needs prevention)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="important">
+                <strong>Practical Consideration:</strong> Most systems use a combination of both techniques, choosing the method that minimizes overall recovery cost based on the specific deadlock situation.
+            </div>
+
+            <h3>Combined Approach to Deadlock Handling</h3>
+            <p>Many modern operating systems use a combined approach:</p>
+            <ul>
+                <li>Use prevention for specific resource types prone to deadlock</li>
+                <li>Apply avoidance for critical system resources</li>
+                <li>Employ detection and recovery for less critical resources</li>
+                <li>Accept occasional deadlocks in non-critical scenarios (ostrich algorithm)</li>
+                <li>Balance between overhead and system performance</li>
+            </ul>
+        </section>
+
+        <section id="exam" class="exam-focus">
+            <h2>10. Exam Focus Box</h2>
+
+            <h3>Important Definitions to Memorize</h3>
+            <ul>
+                <li><strong>Process Synchronization:</strong> Coordination of concurrent processes to ensure controlled access to shared resources</li>
+                <li><strong>Critical Section:</strong> Code segment where shared resources are accessed and must be executed atomically</li>
+                <li><strong>Mutual Exclusion:</strong> Ensuring only one process executes in critical section at a time</li>
+                <li><strong>Semaphore:</strong> Integer variable used for signaling between processes to control resource access</li>
+                <li><strong>Mutex:</strong> Binary locking mechanism providing mutual exclusion with ownership</li>
+                <li><strong>Deadlock:</strong> Permanent blocking state where processes wait for resources held by each other</li>
+                <li><strong>Safe State:</strong> System state where all processes can complete without deadlock</li>
+                <li><strong>Unsafe State:</strong> System state where deadlock may occur but not guaranteed</li>
+                <li><strong>Banker's Algorithm:</strong> Deadlock avoidance algorithm ensuring system remains in safe state</li>
+                <li><strong>Resource Allocation Graph:</strong> Directed graph representing resource allocation and requests</li>
+            </ul>
+
+            <h3>Frequently Asked AKTU Questions from Unit 3</h3>
+            <ul>
+                <li>Define critical section problem and explain requirements for its solution</li>
+                <li>Differentiate between mutex and semaphore with examples</li>
+                <li>Explain binary semaphore and counting semaphore</li>
+                <li>Describe Producer-Consumer problem with semaphore solution approach</li>
+                <li>Explain Readers-Writers problem and its variants</li>
+                <li>Describe Dining Philosophers problem and possible solutions</li>
+                <li>Define deadlock and explain Coffman conditions in detail</li>
+                <li>Compare deadlock prevention, avoidance, detection, and recovery</li>
+                <li>Explain safe state and unsafe state with examples</li>
+                <li>Describe Banker's Algorithm with data structures and steps</li>
+                <li>Explain Resource Allocation Graph and cycle detection</li>
+                <li>Describe deadlock detection methods for single and multiple resource instances</li>
+                <li>Explain deadlock recovery techniques: process termination and resource preemption</li>
+                <li>Differentiate between deadlock and starvation</li>
+            </ul>
+
+            <h3>Keywords to Use in Answers</h3>
+            <ul>
+                <li>Race condition, data inconsistency, concurrent execution</li>
+                <li>Atomic operation, critical section, entry section, exit section</li>
+                <li>Mutual exclusion, progress, bounded waiting</li>
+                <li>Wait operation, signal operation, P and V operations</li>
+                <li>Binary semaphore, counting semaphore, mutex lock</li>
+                <li>Locking mechanism, signaling mechanism, ownership</li>
+                <li>Circular wait, hold and wait, no preemption</li>
+                <li>Safe sequence, unsafe state, resource allocation</li>
+                <li>Available resources, maximum need, current allocation</li>
+                <li>Safety algorithm, request algorithm, pretend allocation</li>
+                <li>Wait-for graph, cycle detection, victim selection</li>
+                <li>Rollback, checkpoint, starvation prevention</li>
+            </ul>
+
+            <h3>Common Mistakes Students Make</h3>
+            <ul>
+                <li>Confusing mutex with semaphore - remember mutex has ownership, semaphore does not</li>
+                <li>Forgetting all four Coffman conditions - must mention all for full marks</li>
+                <li>Not explaining that all four conditions must exist simultaneously for deadlock</li>
+                <li>Mixing up safe state and deadlock-free state - safe state guarantees no deadlock</li>
+                <li>Forgetting to mention that unsafe state does not guarantee deadlock</li>
+                <li>Not clearly distinguishing between prevention and avoidance methods</li>
+                <li>Confusing deadlock with starvation - deadlock is permanent, starvation is indefinite postponement</li>
+                <li>Not mentioning data structures in Banker's Algorithm (Available, Max, Allocation, Need)</li>
+                <li>Forgetting the formula: Need = Max - Allocation</li>
+                <li>Not explaining victim selection criteria in recovery techniques</li>
+                <li>Missing the difference between total and partial rollback</li>
+            </ul>
+
+            <h3>Answer Writing Tips</h3>
+            <ul>
+                <li>Always start critical section answers with three requirements: mutual exclusion, progress, bounded waiting</li>
+                <li>When comparing mutex and semaphore, use a table format for clarity</li>
+                <li>For classical problems, briefly describe the problem setup before explaining the solution</li>
+                <li>Always list all four Coffman conditions with clear explanations</li>
+                <li>When explaining Banker's Algorithm, mention data structures first, then algorithm steps</li>
+                <li>Use diagrams for Resource Allocation Graphs when possible</li>
+                <li>Clearly differentiate between safe and unsafe states with examples</li>
+                <li>Mention both advantages and disadvantages for each deadlock handling method</li>
+                <li>For recovery techniques, explain victim selection criteria</li>
+                <li>Conclude with practical applications or importance where relevant</li>
+            </ul>
+
+            <h3>High-Weightage Topics</h3>
+            <ul>
+                <li>Critical section problem and requirements - 7 marks</li>
+                <li>Mutex vs Semaphore comparison - 7 marks</li>
+                <li>Classical synchronization problems (any one) - 7 marks</li>
+                <li>Coffman conditions for deadlock - 7 marks</li>
+                <li>Methods for handling deadlocks (comparison) - 10 marks</li>
+                <li>Banker's Algorithm concept and steps - 10 marks</li>
+                <li>Safe state vs Unsafe state - 5 marks</li>
+                <li>Deadlock detection and recovery - 10 marks</li>
+            </ul>
+
+            <h3>Quick Revision Points</h3>
+            <ul>
+                <li>Process synchronization prevents race conditions and ensures data consistency</li>
+                <li>Critical section requires mutual exclusion, progress, and bounded waiting</li>
+                <li>Mutex is a lock, semaphore is a counter</li>
+                <li>Binary semaphore: 0 or 1; Counting semaphore: 0 to N</li>
+                <li>Producer-Consumer uses empty, full, and mutex semaphores</li>
+                <li>Four Coffman conditions: mutual exclusion, hold and wait, no preemption, circular wait</li>
+                <li>Prevention: Remove at least one Coffman condition</li>
+                <li>Avoidance: Keep system in safe state using Banker's Algorithm</li>
+                <li>Detection: Find cycles in wait-for graph or use detection algorithm</li>
+                <li>Recovery: Process termination or resource preemption</li>
+                <li>Safe state guarantees no deadlock; unsafe state means deadlock possible</li>
+                <li>Banker's Algorithm uses Available, Max, Allocation, Need matrices</li>
+            </ul>
+
+            <h3>Last-Minute Memory Tricks</h3>
+            <ul>
+                <li><strong>Critical Section Requirements:</strong> MPB (Mutual exclusion, Progress, Bounded waiting)</li>
+                <li><strong>Coffman Conditions:</strong> MHN-C (Mutual exclusion, Hold and wait, No preemption, Circular wait)</li>
+                <li><strong>Deadlock Handling:</strong> PADR (Prevention, Avoidance, Detection, Recovery)</li>
+                <li><strong>Banker's Algorithm:</strong> AMAN (Available, Max, Allocation, Need)</li>
+                <li><strong>Semaphore Operations:</strong> WS (Wait, Signal) or PV (Proberen, Verhogen in Dutch)</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>Prepared for AKTU B.Tech CSE – Operating System Unit 3: Process Synchronization & Deadlocks</p>
+        <p>Study Smart, Score High - Best Wishes for Your Exams</p>
+    </footer>
+
+    <script>
+        window.onbeforeprint = function () {
+            alert("Printing is disabled. Please view the content on the website.");
+        };
+        
+        document.addEventListener("contextmenu", function(e) {
+            e.preventDefault();
+        });
+
+        document.addEventListener("keydown", function(e) {
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                alert("Printing is disabled. Please view the content on aktunotes.live.");
+            }
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                alert("Saving is disabled. Please view the content on aktunotes.live.");
+            }
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

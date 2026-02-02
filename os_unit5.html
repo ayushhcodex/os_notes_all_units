@@ -1,0 +1,2166 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operating System – Unit 5 | File System & I/O Management | AKTU B.Tech CSE</title>
+    <style>
+        /* Fixed Home Button */
+.home-btn{
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    padding: 8px 14px;
+    background: #1e293b;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    z-index: 10000;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+
+.home-btn:hover{
+    background: #0f172a;
+}
+
+/* Smooth scroll */
+html{
+    scroll-behavior: smooth;
+}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #2c3e50;
+            padding: 20px;
+            position: relative;
+        }
+
+         body::after {
+            content: "Operating system unit 5  • aktunotes.live";
+            position: fixed;
+            top: 40%;
+            left: 5%;
+            font-size: 28px;
+            color: rgba(0,0,0,0.05);
+            transform: rotate(-30deg);
+            pointer-events: none;
+            z-index: 9999;
+            width: 100%;
+            text-align: center;
+        }
+
+        @media print {
+            body {
+                display: none !important;
+            }
+        } 
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+
+        nav {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        nav h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        nav ul {
+            list-style: none;
+            columns: 2;
+            column-gap: 30px;
+        }
+
+        nav ul li {
+            margin: 10px 0;
+            break-inside: avoid;
+        }
+
+        nav ul li a {
+            color: #764ba2;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: block;
+            padding: 8px 12px;
+            border-radius: 5px;
+        }
+
+        nav ul li a:hover {
+            background: #f0f0f0;
+            color: #667eea;
+            transform: translateX(5px);
+        }
+
+        main {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        section {
+            margin-bottom: 50px;
+        }
+
+        section h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        section h3 {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        section h4 {
+            color: #555;
+            font-size: 1.2em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .definition {
+            background: #e8f4f8;
+            border-left: 5px solid #667eea;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+
+        .important {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .note {
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        table th, table td {
+            padding: 15px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        table tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        table tbody tr:hover {
+            background: #e8f4f8;
+        }
+
+        ul, ol {
+            margin: 15px 0 15px 40px;
+        }
+
+        ul li, ol li {
+            margin: 8px 0;
+        }
+
+        .exam-focus {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 40px;
+        }
+
+        .exam-focus h2 {
+            color: white;
+            border-bottom: 3px solid white;
+        }
+
+        .exam-focus h3 {
+            color: #fff3cd;
+            margin-top: 20px;
+        }
+
+        .exam-focus ul {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .exam-focus ul li::before {
+            content: "✓ ";
+            color: #fff3cd;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            main {
+                padding: 20px;
+            }
+
+            nav ul {
+                columns: 1;
+            }
+
+            body::after {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body id="top">
+<a href="#top" class="home-btn">↑</a>
+    
+    <header>
+        <h1>Operating System – Unit 5</h1>
+        <p>File System & I/O Management | AKTU B.Tech CSE – Exam Oriented Notes</p>
+    </header>
+
+    <nav>
+        <h2>Table of Contents</h2>
+        <ul>
+            <li><a href="#intro-file">Introduction to File System</a></li>
+            <li><a href="#access-methods">File Access Methods</a></li>
+            <li><a href="#directory">Directory Structure</a></li>
+            <li><a href="#allocation">File Allocation Methods</a></li>
+            <li><a href="#free-space">Free Space Management</a></li>
+            <li><a href="#disk">Disk Structure and Disk Scheduling</a></li>
+            <li><a href="#io-management">I/O Management</a></li>
+            <li><a href="#buffering">I/O Buffering and Caching</a></li>
+            <li><a href="#protection">Protection and Security in File System</a></li>
+            <li><a href="#exam">Exam Focus Box</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="intro-file">
+            <h2>1. Introduction to File System</h2>
+
+            <div class="definition">
+                A file is a named collection of related information that is recorded on secondary storage. It is the smallest unit of logical storage that a user can manipulate. Files are used to store programs, data, and documents.
+            </div>
+
+            <h3>Definition of File</h3>
+            <p>A file is a sequence of bits, bytes, lines, or records whose meaning is defined by the file's creator and user. From the operating system's perspective, a file is a contiguous logical address space. Files represent programs (both source and object forms) and data, and they can contain numeric, alphabetic, alphanumeric, or binary information.</p>
+
+            <h3>File Attributes</h3>
+            <p>File attributes are properties or characteristics of a file that provide information about the file to the operating system and users. Common file attributes include:</p>
+
+            <h4>1. Name</h4>
+            <p>The symbolic file name is the only information kept in human-readable form. It is the identifier that users use to reference the file. File names typically have extensions that indicate the file type.</p>
+
+            <h4>2. Identifier</h4>
+            <p>This unique tag, usually a number, identifies the file within the file system. It is the internal name for the file, not visible to users. In many systems, this is called an inode number.</p>
+
+            <h4>3. Type</h4>
+            <p>Information about the file type is needed for systems that support different types of files. Examples include text files, executable files, image files, video files, etc.</p>
+
+            <h4>4. Location</h4>
+            <p>This attribute contains information about the device and the location of the file on that device. It is a pointer to the file's physical location on the storage device.</p>
+
+            <h4>5. Size</h4>
+            <p>The current size of the file in bytes, kilobytes, or megabytes. This attribute also includes information about the maximum size the file can grow to.</p>
+
+            <h4>6. Protection</h4>
+            <p>Access control information determines who can read, write, execute, or delete the file. This includes permissions for the owner, group, and others.</p>
+
+            <h4>7. Time, Date, and User Identification</h4>
+            <p>Information about when the file was created, last modified, and last accessed. This also includes the identity of the user who created or last modified the file.</p>
+
+            <h3>File Operations</h3>
+            <p>The operating system provides system calls to perform various operations on files:</p>
+
+            <h4>1. Creating a File</h4>
+            <p>Two steps are necessary to create a file. First, space in the file system must be found for the file. Second, an entry for the new file must be made in the directory. The directory entry records the name of the file and its location in the file system.</p>
+
+            <h4>2. Writing a File</h4>
+            <p>To write to a file, the system call specifies the name of the file and the data to be written. The system searches the directory for the file name, maintains a write pointer to the location where the next write is to take place, and updates the write pointer after each write operation.</p>
+
+            <h4>3. Reading a File</h4>
+            <p>To read from a file, the system call specifies the name of the file and where in memory the data should be placed. The directory is searched for the associated entry, and the system maintains a read pointer indicating the next read location. After reading, the read pointer is updated.</p>
+
+            <h4>4. Repositioning within a File (Seek)</h4>
+            <p>The directory is searched for the appropriate entry, and the current file position is reset to a given value. This operation does not involve actual I/O and is also known as a file seek operation.</p>
+
+            <h4>5. Deleting a File</h4>
+            <p>To delete a file, the directory is searched for the named file. The directory entry is released, and the file's storage space is freed for reuse by other files.</p>
+
+            <h4>6. Truncating a File</h4>
+            <p>This operation allows all attributes of a file to remain unchanged except for file length, which is reset to zero. The file's contents are erased, but its attributes and directory entry remain.</p>
+
+            <h4>7. Opening a File</h4>
+            <p>Before using a file, a process must open it. The operating system maintains an open-file table containing information about all open files. When a file operation is requested, the file is specified via an index into the open-file table.</p>
+
+            <h4>8. Closing a File</h4>
+            <p>When a process is finished using a file, it should close the file. The operating system removes the entry from the open-file table and releases system resources associated with the file.</p>
+
+            <h3>Role of Operating System in File Management</h3>
+            <p>The operating system plays a crucial role in managing files and the file system:</p>
+
+            <ul>
+                <li><strong>File Organization:</strong> The OS organizes files in a systematic manner using directories and subdirectories</li>
+                <li><strong>Storage Management:</strong> Allocates and deallocates storage space for files on secondary storage devices</li>
+                <li><strong>Access Control:</strong> Implements security mechanisms to control who can access which files and in what manner</li>
+                <li><strong>File Naming:</strong> Provides a naming mechanism that allows users to reference files by symbolic names</li>
+                <li><strong>Backup and Recovery:</strong> Facilitates file backup and recovery operations to prevent data loss</li>
+                <li><strong>File Sharing:</strong> Enables multiple users or processes to share files while maintaining consistency</li>
+                <li><strong>File Protection:</strong> Protects files from unauthorized access, modification, or deletion</li>
+                <li><strong>File System Maintenance:</strong> Maintains file system integrity through error checking and recovery mechanisms</li>
+                <li><strong>Performance Optimization:</strong> Optimizes file access and storage for better system performance</li>
+            </ul>
+
+            <div class="important">
+                <strong>Key Point for Exams:</strong> Files are the logical storage units that users interact with, while the operating system manages the physical storage, organization, protection, and access to these files through the file system.
+            </div>
+        </section>
+
+        <section id="access-methods">
+            <h2>2. File Access Methods</h2>
+
+            <div class="definition">
+                File access methods determine how the records of a file can be accessed or read from the file. The choice of access method depends on the application requirements and the nature of the data stored in the file.
+            </div>
+
+            <h3>1. Sequential Access</h3>
+
+            <div class="definition">
+                In sequential access, information in the file is accessed in a sequential order, one record after another. The file is read from the beginning and processed sequentially until the desired information is found or the end of file is reached.
+            </div>
+
+            <h4>Characteristics of Sequential Access</h4>
+            <ul>
+                <li>Records are accessed in the order they are stored</li>
+                <li>To access record N, all records from 1 to N-1 must be accessed first</li>
+                <li>Read and write operations move the file pointer forward</li>
+                <li>Simple and straightforward implementation</li>
+                <li>Most common access method for files</li>
+                <li>Suitable for tape drives and sequential processing</li>
+            </ul>
+
+            <h4>Operations in Sequential Access</h4>
+            <ul>
+                <li><strong>Read Next:</strong> Reads the next record and advances the file pointer</li>
+                <li><strong>Write Next:</strong> Writes to the next position and advances the file pointer</li>
+                <li><strong>Reset:</strong> Moves the file pointer to the beginning of the file</li>
+                <li><strong>Skip N Records:</strong> Moves the file pointer forward by N records</li>
+            </ul>
+
+            <h4>Advantages of Sequential Access</h4>
+            <ul>
+                <li>Simple to implement and use</li>
+                <li>Efficient for processing entire files</li>
+                <li>Low overhead and minimal memory requirements</li>
+                <li>Works well with sequential storage devices like tapes</li>
+                <li>Suitable for batch processing applications</li>
+            </ul>
+
+            <h4>Disadvantages of Sequential Access</h4>
+            <ul>
+                <li>Time-consuming to access specific records</li>
+                <li>Inefficient for random queries</li>
+                <li>Must read through all preceding records to reach a specific record</li>
+                <li>Not suitable for interactive applications requiring quick access</li>
+            </ul>
+
+            <div class="note">
+                <strong>Example:</strong> Reading a text file from beginning to end, processing payroll records in order, reading log files sequentially.
+            </div>
+
+            <h3>2. Direct Access (Random Access)</h3>
+
+            <div class="definition">
+                Direct access allows random access to any record without accessing the preceding records. Records can be read or written in any order based on their physical location in the file.
+            </div>
+
+            <h4>Characteristics of Direct Access</h4>
+            <ul>
+                <li>Records can be accessed in any order</li>
+                <li>Each record has a unique address or record number</li>
+                <li>File is viewed as a numbered sequence of blocks or records</li>
+                <li>Requires direct access storage devices like disks</li>
+                <li>Fast access to any record without sequential searching</li>
+            </ul>
+
+            <h4>Operations in Direct Access</h4>
+            <ul>
+                <li><strong>Read N:</strong> Reads the record at position N</li>
+                <li><strong>Write N:</strong> Writes to the record at position N</li>
+                <li><strong>Position to N:</strong> Moves the file pointer to position N</li>
+                <li><strong>Read Next:</strong> Reads the next record from current position</li>
+                <li><strong>Write Next:</strong> Writes to the next position from current position</li>
+            </ul>
+
+            <h4>Advantages of Direct Access</h4>
+            <ul>
+                <li>Fast access to any record</li>
+                <li>Efficient for random queries and updates</li>
+                <li>Suitable for database systems and interactive applications</li>
+                <li>No need to search through preceding records</li>
+                <li>Supports both sequential and random access patterns</li>
+            </ul>
+
+            <h4>Disadvantages of Direct Access</h4>
+            <ul>
+                <li>Requires direct access storage devices (not suitable for tapes)</li>
+                <li>More complex implementation than sequential access</li>
+                <li>May require additional index structures</li>
+                <li>Potential for fragmentation</li>
+            </ul>
+
+            <div class="note">
+                <strong>Example:</strong> Database management systems, accessing student records by ID, airline reservation systems.
+            </div>
+
+            <h3>3. Indexed Access</h3>
+
+            <div class="definition">
+                Indexed access uses an index to locate records in a file. The index contains pointers to various blocks or records, allowing fast access to specific records without sequential searching.
+            </div>
+
+            <h4>Characteristics of Indexed Access</h4>
+            <ul>
+                <li>Maintains a separate index file containing key-pointer pairs</li>
+                <li>Index is searched to find the location of the desired record</li>
+                <li>Combines advantages of sequential and direct access</li>
+                <li>Index can be based on one or more fields (keys)</li>
+                <li>Supports efficient searching and retrieval</li>
+            </ul>
+
+            <h4>How Indexed Access Works</h4>
+            <ol>
+                <li>Search the index file to find the entry for the desired record</li>
+                <li>Obtain the pointer or address from the index entry</li>
+                <li>Use the pointer to directly access the record in the data file</li>
+                <li>Read or modify the record as needed</li>
+            </ol>
+
+            <h4>Advantages of Indexed Access</h4>
+            <ul>
+                <li>Fast retrieval of specific records</li>
+                <li>Supports multiple access paths through different indexes</li>
+                <li>Efficient for large files with frequent queries</li>
+                <li>Reduces search time significantly</li>
+                <li>Suitable for databases with multiple search criteria</li>
+            </ul>
+
+            <h4>Disadvantages of Indexed Access</h4>
+            <ul>
+                <li>Requires additional storage space for index</li>
+                <li>Index must be maintained and updated with file changes</li>
+                <li>More complex implementation and overhead</li>
+                <li>Index file can become large for big files</li>
+                <li>Performance depends on index organization and size</li>
+            </ul>
+
+            <div class="note">
+                <strong>Example:</strong> Library catalog systems, employee databases indexed by employee ID, product catalogs indexed by product code.
+            </div>
+
+            <h3>Comparison of Access Methods</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Sequential Access</th>
+                        <th>Direct Access</th>
+                        <th>Indexed Access</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Access Pattern</td>
+                        <td>One after another</td>
+                        <td>Any order</td>
+                        <td>Through index</td>
+                    </tr>
+                    <tr>
+                        <td>Speed for Specific Record</td>
+                        <td>Slow</td>
+                        <td>Fast</td>
+                        <td>Fast</td>
+                    </tr>
+                    <tr>
+                        <td>Implementation Complexity</td>
+                        <td>Simple</td>
+                        <td>Moderate</td>
+                        <td>Complex</td>
+                    </tr>
+                    <tr>
+                        <td>Storage Overhead</td>
+                        <td>Minimal</td>
+                        <td>Minimal</td>
+                        <td>High (index space)</td>
+                    </tr>
+                    <tr>
+                        <td>Best For</td>
+                        <td>Batch processing</td>
+                        <td>Random queries</td>
+                        <td>Large databases</td>
+                    </tr>
+                    <tr>
+                        <td>Device Requirement</td>
+                        <td>Any</td>
+                        <td>Disk required</td>
+                        <td>Disk required</td>
+                    </tr>
+                    <tr>
+                        <td>Maintenance</td>
+                        <td>Easy</td>
+                        <td>Easy</td>
+                        <td>Complex (index updates)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="important">
+                <strong>Remember for Exams:</strong> Sequential access is simplest but slowest for specific records; Direct access is fastest for random access; Indexed access provides fast retrieval but requires additional space and maintenance for indexes.
+            </div>
+        </section>
+
+        <section id="directory">
+            <h2>3. Directory Structure</h2>
+
+            <div class="definition">
+                A directory is a container that stores information about files and other directories. It provides a way to organize files hierarchically and helps users locate files easily. The directory structure determines how files are organized and accessed in the file system.
+            </div>
+
+            <h3>1. Single-Level Directory</h3>
+
+            <div class="definition">
+                In a single-level directory structure, all files are contained in the same directory. There is only one directory for all users, and all files have unique names.
+            </div>
+
+            <h4>Characteristics</h4>
+            <ul>
+                <li>Simplest directory structure</li>
+                <li>All files are in one directory</li>
+                <li>Each file must have a unique name</li>
+                <li>No grouping or organization capability</li>
+                <li>All users share the same directory</li>
+            </ul>
+
+            <h4>Advantages of Single-Level Directory</h4>
+            <ul>
+                <li>Simple to implement and understand</li>
+                <li>Easy to locate files since all are in one place</li>
+                <li>Minimal overhead for directory management</li>
+                <li>Fast file searching in small systems</li>
+            </ul>
+
+            <h4>Disadvantages of Single-Level Directory</h4>
+            <ul>
+                <li>Naming conflicts - all files must have unique names</li>
+                <li>No organization - difficult to manage large numbers of files</li>
+                <li>No grouping of related files</li>
+                <li>Not suitable for multi-user systems</li>
+                <li>Scalability issues with many files</li>
+                <li>No privacy between users</li>
+            </ul>
+
+            <div class="note">
+                <strong>Example:</strong> Early personal computers and simple embedded systems used single-level directories.
+            </div>
+
+            <h3>2. Two-Level Directory</h3>
+
+            <div class="definition">
+                In a two-level directory structure, there is a separate directory for each user. The system maintains a master file directory (MFD) that contains entries for each user's user file directory (UFD).
+            </div>
+
+            <h4>Characteristics</h4>
+            <ul>
+                <li>Two levels of directories: MFD and UFD</li>
+                <li>Each user has their own separate directory</li>
+                <li>Files with the same name can exist in different user directories</li>
+                <li>System files are kept separate from user files</li>
+                <li>Provides user isolation</li>
+            </ul>
+
+            <h4>Structure</h4>
+            <ul>
+                <li><strong>Master File Directory (MFD):</strong> Contains one entry for each user, pointing to their UFD</li>
+                <li><strong>User File Directory (UFD):</strong> Contains entries for all files belonging to that user</li>
+                <li>Path name format: username/filename</li>
+            </ul>
+
+            <h4>Advantages of Two-Level Directory</h4>
+            <ul>
+                <li>Solves naming problem - different users can have files with same names</li>
+                <li>Provides user isolation and privacy</li>
+                <li>Easier file management per user</li>
+                <li>Efficient searching within user's directory</li>
+                <li>Suitable for multi-user systems</li>
+            </ul>
+
+            <h4>Disadvantages of Two-Level Directory</h4>
+            <ul>
+                <li>Limited organization - no subdirectories within user directories</li>
+                <li>Difficult to share files between users</li>
+                <li>Cannot group related files within a user's directory</li>
+                <li>Still not flexible enough for complex file organizations</li>
+                <li>Path names are limited to two levels</li>
+            </ul>
+
+            <h3>3. Tree-Structured Directory</h3>
+
+            <div class="definition">
+                A tree-structured directory allows users to create subdirectories and organize files in a hierarchical tree structure. Each user can have their own directory structure with unlimited levels of subdirectories.
+            </div>
+
+            <h4>Characteristics</h4>
+            <ul>
+                <li>Hierarchical organization with multiple levels</li>
+                <li>Each directory can contain files and subdirectories</li>
+                <li>Root directory at the top of the hierarchy</li>
+                <li>Paths specify the route from root to a file</li>
+                <li>Most commonly used directory structure</li>
+            </ul>
+
+            <h4>Path Names</h4>
+            <ul>
+                <li><strong>Absolute Path:</strong> Complete path from root directory to the file (e.g., /home/user/documents/file.txt)</li>
+                <li><strong>Relative Path:</strong> Path from current directory to the file (e.g., documents/file.txt)</li>
+            </ul>
+
+            <h4>Advantages of Tree-Structured Directory</h4>
+            <ul>
+                <li>Excellent file organization and grouping capability</li>
+                <li>Natural and intuitive structure</li>
+                <li>Efficient searching using hierarchical paths</li>
+                <li>Flexibility in organizing files and directories</li>
+                <li>Supports logical grouping of related files</li>
+                <li>Scalable to large file systems</li>
+                <li>Easy navigation and file management</li>
+            </ul>
+
+            <h4>Disadvantages of Tree-Structured Directory</h4>
+            <ul>
+                <li>More complex implementation than single or two-level</li>
+                <li>Longer path names for deeply nested files</li>
+                <li>Difficult to share files between different branches</li>
+                <li>File duplication needed for sharing (wastes space)</li>
+                <li>Deletion of shared files can cause inconsistencies</li>
+            </ul>
+
+            <div class="note">
+                <strong>Example:</strong> Modern operating systems like Windows (C:\Users\Documents\), Linux (/home/user/documents/), and macOS use tree-structured directories.
+            </div>
+
+            <h3>4. Acyclic Graph Directory</h3>
+
+            <div class="definition">
+                An acyclic graph directory allows directories and files to be shared between different users and directories. Files and subdirectories can have multiple parent directories, creating a graph structure without cycles.
+            </div>
+
+            <h4>Characteristics</h4>
+            <ul>
+                <li>Extends tree structure to allow sharing</li>
+                <li>Files can have multiple absolute path names</li>
+                <li>Implemented using links (hard links or symbolic links)</li>
+                <li>Shared files appear in multiple directories</li>
+                <li>No cycles allowed (prevents infinite loops)</li>
+            </ul>
+
+            <h4>Implementation Methods</h4>
+            <ul>
+                <li><strong>Hard Links:</strong> Multiple directory entries point to the same file data; deletion requires reference counting</li>
+                <li><strong>Symbolic Links (Soft Links):</strong> Contains path to another file; if target is deleted, link becomes dangling</li>
+            </ul>
+
+            <h4>Advantages of Acyclic Graph Directory</h4>
+            <ul>
+                <li>Enables file and directory sharing efficiently</li>
+                <li>Avoids file duplication - saves storage space</li>
+                <li>Multiple users can access the same file</li>
+                <li>Changes to shared file are immediately visible to all users</li>
+                <li>More flexible than tree structure</li>
+            </ul>
+
+            <h4>Disadvantages of Acyclic Graph Directory</h4>
+            <ul>
+                <li>Complex implementation and maintenance</li>
+                <li>Difficult deletion semantics - need reference counting</li>
+                <li>Dangling pointers possible with symbolic links</li>
+                <li>More overhead to maintain links and references</li>
+                <li>Potential for confusion with multiple paths to same file</li>
+                <li>Traversal algorithms are more complex</li>
+            </ul>
+
+            <div class="important">
+                <strong>Key Difference:</strong> Tree structure does not allow sharing (each file has one parent), while acyclic graph allows sharing (files can have multiple parents) without creating cycles.
+            </div>
+
+            <h3>Summary Comparison</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Structure</th>
+                        <th>Organization</th>
+                        <th>Sharing</th>
+                        <th>Complexity</th>
+                        <th>Best Use</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Single-Level</td>
+                        <td>Flat (all in one directory)</td>
+                        <td>Not supported</td>
+                        <td>Very simple</td>
+                        <td>Small, single-user systems</td>
+                    </tr>
+                    <tr>
+                        <td>Two-Level</td>
+                        <td>One level per user</td>
+                        <td>Difficult</td>
+                        <td>Simple</td>
+                        <td>Basic multi-user systems</td>
+                    </tr>
+                    <tr>
+                        <td>Tree-Structured</td>
+                        <td>Hierarchical</td>
+                        <td>Via duplication</td>
+                        <td>Moderate</td>
+                        <td>Most modern systems</td>
+                    </tr>
+                    <tr>
+                        <td>Acyclic Graph</td>
+                        <td>Hierarchical with links</td>
+                        <td>Fully supported</td>
+                        <td>Complex</td>
+                        <td>Advanced file sharing needs</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="allocation">
+            <h2>4. File Allocation Methods</h2>
+
+            <div class="definition">
+                File allocation methods determine how disk space is allocated to files. The allocation method impacts storage efficiency, access speed, and fragmentation. The main allocation methods are contiguous, linked, and indexed allocation.
+            </div>
+
+            <h3>1. Contiguous Allocation</h3>
+
+            <div class="definition">
+                In contiguous allocation, each file occupies a set of contiguous blocks on the disk. The directory entry for each file contains the starting block address and the length of the file.
+            </div>
+
+            <h4>How Contiguous Allocation Works</h4>
+            <ul>
+                <li>File is stored in consecutive disk blocks</li>
+                <li>Directory entry stores: starting address and length</li>
+                <li>To access block i of a file starting at block b, simply access block b+i</li>
+                <li>Simple and efficient for sequential and direct access</li>
+            </ul>
+
+            <h4>Advantages of Contiguous Allocation</h4>
+            <ul>
+                <li>Simple to implement - only starting location and length needed</li>
+                <li>Excellent performance for sequential access</li>
+                <li>Supports both sequential and direct access efficiently</li>
+                <li>Minimal seek time due to block proximity</li>
+                <li>Fast access - can calculate address directly</li>
+                <li>No external pointers needed</li>
+            </ul>
+
+            <h4>Disadvantages of Contiguous Allocation</h4>
+            <ul>
+                <li>Suffers from external fragmentation as files are deleted</li>
+                <li>Difficult to grow files - may need to relocate entire file</li>
+                <li>Must know file size at creation time</li>
+                <li>May need compaction to reduce fragmentation</li>
+                <li>Finding space for a new file can be time-consuming</li>
+                <li>Wasteful if file size is overestimated</li>
+            </ul>
+
+            <div class="note">
+                <strong>Example:</strong> If a file needs 5 blocks and starts at block 10, it occupies blocks 10, 11, 12, 13, and 14.
+            </div>
+
+            <h3>2. Linked Allocation</h3>
+
+            <div class="definition">
+                In linked allocation, each file is a linked list of disk blocks. The blocks can be scattered anywhere on the disk. Each block contains a pointer to the next block in the file.
+            </div>
+
+            <h4>How Linked Allocation Works</h4>
+            <ul>
+                <li>File is stored as a linked list of blocks</li>
+                <li>Each block contains data and a pointer to the next block</li>
+                <li>Directory entry contains pointer to first and last blocks</li>
+                <li>Blocks can be located anywhere on the disk</li>
+                <li>No external fragmentation</li>
+            </ul>
+
+            <h4>Advantages of Linked Allocation</h4>
+            <ul>
+                <li>No external fragmentation</li>
+                <li>Files can easily grow - just allocate new blocks and update links</li>
+                <li>No need to declare file size at creation</li>
+                <li>Simple to implement</li>
+                <li>Any free block can be used</li>
+                <li>Efficient use of disk space</li>
+            </ul>
+
+            <h4>Disadvantages of Linked Allocation</h4>
+            <ul>
+                <li>Inefficient for direct access - must traverse links from beginning</li>
+                <li>Pointer storage overhead reduces effective block size</li>
+                <li>Reliability issues - if one pointer is corrupted, rest of file is lost</li>
+                <li>Poor locality - blocks may be scattered, increasing seek time</li>
+                <li>Slow sequential access due to disk head movement</li>
+            </ul>
+
+            <h4>Variants</h4>
+            <ul>
+                <li><strong>File Allocation Table (FAT):</strong> Stores all links in a separate table in memory for faster access</li>
+                <li><strong>Doubly Linked:</strong> Each block has pointers to both next and previous blocks</li>
+            </ul>
+
+            <div class="note">
+                <strong>Example:</strong> A file's first block might be at location 10, which points to block 25, which points to block 47, and so on.
+            </div>
+
+            <h3>3. Indexed Allocation</h3>
+
+            <div class="definition">
+                Indexed allocation brings all the pointers together into one location called an index block. Each file has its own index block, which is an array of disk block addresses.
+            </div>
+
+            <h4>How Indexed Allocation Works</h4>
+            <ul>
+                <li>Each file has an index block containing pointers to all data blocks</li>
+                <li>Directory entry contains the address of the index block</li>
+                <li>Index block entries point to data blocks of the file</li>
+                <li>To access block i, use the pointer in the i-th index block entry</li>
+                <li>Supports direct access efficiently</li>
+            </ul>
+
+            <h4>Advantages of Indexed Allocation</h4>
+            <ul>
+                <li>Supports efficient direct access to any block</li>
+                <li>No external fragmentation</li>
+                <li>Files can grow dynamically</li>
+                <li>No need to declare file size at creation</li>
+                <li>All pointers are in one place (index block)</li>
+                <li>Better than linked allocation for random access</li>
+            </ul>
+
+            <h4>Disadvantages of Indexed Allocation</h4>
+            <ul>
+                <li>Pointer overhead - index block wastes space for small files</li>
+                <li>Requires extra block access to read index block</li>
+                <li>Size of index block limits maximum file size</li>
+                <li>More complex implementation than other methods</li>
+                <li>Index block size must be chosen carefully</li>
+            </ul>
+
+            <h4>Solutions for Large Files</h4>
+            <ul>
+                <li><strong>Linked Scheme:</strong> Link multiple index blocks together</li>
+                <li><strong>Multilevel Index:</strong> First-level index points to second-level index blocks</li>
+                <li><strong>Combined Scheme:</strong> Use direct blocks, single indirect, double indirect, and triple indirect blocks (used in UNIX inode)</li>
+            </ul>
+
+            <div class="note">
+                <strong>Example:</strong> UNIX inode structure uses a combined scheme with 12 direct pointers, 1 single indirect, 1 double indirect, and 1 triple indirect pointer.
+            </div>
+
+            <h3>Comparison of File Allocation Methods</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Contiguous</th>
+                        <th>Linked</th>
+                        <th>Indexed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>External Fragmentation</td>
+                        <td>Yes</td>
+                        <td>No</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td>Sequential Access</td>
+                        <td>Excellent</td>
+                        <td>Good</td>
+                        <td>Good</td>
+                    </tr>
+                    <tr>
+                        <td>Direct Access</td>
+                        <td>Excellent</td>
+                        <td>Poor</td>
+                        <td>Excellent</td>
+                    </tr>
+                    <tr>
+                        <td>File Growth</td>
+                        <td>Difficult</td>
+                        <td>Easy</td>
+                        <td>Easy</td>
+                    </tr>
+                    <tr>
+                        <td>Pointer Overhead</td>
+                        <td>Minimal</td>
+                        <td>One pointer per block</td>
+                        <td>Index block</td>
+                    </tr>
+                    <tr>
+                        <td>Space Efficiency</td>
+                        <td>Good (but fragmentation)</td>
+                        <td>Good</td>
+                        <td>Moderate (index overhead)</td>
+                    </tr>
+                    <tr>
+                        <td>Reliability</td>
+                        <td>Good</td>
+                        <td>Poor (chain breakage)</td>
+                        <td>Moderate</td>
+                    </tr>
+                    <tr>
+                        <td>Implementation</td>
+                        <td>Simple</td>
+                        <td>Simple</td>
+                        <td>Complex</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="important">
+                <strong>Remember for Exams:</strong> Contiguous is best for sequential access but has fragmentation; Linked eliminates fragmentation but poor for direct access; Indexed supports direct access without fragmentation but has overhead for index blocks.
+            </div>
+        </section>
+
+        <section id="free-space">
+            <h2>5. Free Space Management</h2>
+
+            <div class="definition">
+                Free space management involves tracking which disk blocks are free and available for allocation. The operating system must maintain a data structure to record free blocks and efficiently allocate them when needed.
+            </div>
+
+            <h3>1. Bit Vector (Bit Map) Method</h3>
+
+            <div class="definition">
+                In the bit vector method, each block is represented by one bit. If the block is free, the bit is set to 1; if allocated, the bit is set to 0 (or vice versa depending on implementation).
+            </div>
+
+            <h4>How Bit Vector Works</h4>
+            <ul>
+                <li>Each disk block corresponds to one bit in the bit vector</li>
+                <li>Bit value indicates whether block is free (1) or allocated (0)</li>
+                <li>Bitmap stored in memory or on disk</li>
+                <li>Finding a free block involves scanning the bitmap</li>
+                <li>Multiple consecutive free blocks can be identified easily</li>
+            </ul>
+
+            <h4>Advantages of Bit Vector</h4>
+            <ul>
+                <li>Simple and easy to implement</li>
+                <li>Efficient in finding first free block or n consecutive free blocks</li>
+                <li>Minimal space overhead - only one bit per block</li>
+                <li>Fast allocation and deallocation operations</li>
+                <li>Can use hardware instructions for bit manipulation</li>
+                <li>Easy to find contiguous blocks for contiguous allocation</li>
+            </ul>
+
+            <h4>Disadvantages of Bit Vector</h4>
+            <ul>
+                <li>Inefficient for large disks - bitmap becomes very large</li>
+                <li>Must be kept in memory for efficiency, consuming RAM</li>
+                <li>Keeping bitmap consistent between memory and disk is challenging</li>
+                <li>Scanning large bitmaps can be time-consuming</li>
+            </ul>
+
+            <div class="note">
+                <strong>Example:</strong> For a disk with 1000 blocks, bit vector: 1110101011... where 1 = free, 0 = allocated. Block 0 is free, block 1 is free, block 2 is free, block 3 is allocated, etc.
+            </div>
+
+            <h3>2. Linked List Method</h3>
+
+            <div class="definition">
+                In the linked list method, all free blocks are linked together. Each free block contains a pointer to the next free block, forming a free block list.
+            </div>
+
+            <h4>How Linked List Works</h4>
+            <ul>
+                <li>Free blocks are linked together in a list</li>
+                <li>Head pointer points to the first free block</li>
+                <li>Each free block contains pointer to next free block</li>
+                <li>To allocate: remove block from head of list</li>
+                <li>To deallocate: add block to head of list</li>
+            </ul>
+
+            <h4>Advantages of Linked List</h4>
+            <ul>
+                <li>No waste of disk space for maintaining the list</li>
+                <li>Simple allocation and deallocation (add/remove from head)</li>
+                <li>Can store list on disk, not requiring main memory</li>
+                <li>Works well when only one block is needed at a time</li>
+            </ul>
+
+            <h4>Disadvantages of Linked List</h4>
+            <ul>
+                <li>Inefficient to find contiguous blocks</li>
+                <li>Cannot easily determine number of free blocks</li>
+                <li>List traversal requires multiple disk accesses</li>
+                <li>No spatial locality - free blocks may be scattered</li>
+                <li>Pointers take up space in free blocks</li>
+            </ul>
+
+            <h3>3. Grouping Method</h3>
+
+            <div class="definition">
+                Grouping is a modification of the free list approach. Instead of each free block pointing to one next block, each block stores addresses of n free blocks. The first n-1 blocks are actually free, and the last block contains addresses of another n free blocks.
+            </div>
+
+            <h4>How Grouping Works</h4>
+            <ul>
+                <li>First free block contains addresses of n free blocks</li>
+                <li>First n-1 of these blocks are actually free</li>
+                <li>The nth block contains addresses of next n free blocks</li>
+                <li>Process continues, creating a chain of index blocks</li>
+                <li>Allows finding multiple free blocks quickly</li>
+            </ul>
+
+            <h4>Advantages of Grouping</h4>
+            <ul>
+                <li>Can quickly find multiple free blocks</li>
+                <li>More efficient than simple linked list for bulk allocation</li>
+                <li>Reduces number of disk accesses compared to linked list</li>
+                <li>Good for allocating multiple blocks at once</li>
+            </ul>
+
+            <h4>Disadvantages of Grouping</h4>
+            <ul>
+                <li>More complex than simple linked list</li>
+                <li>Still doesn't guarantee contiguous blocks</li>
+                <li>Overhead of maintaining grouped structure</li>
+            </ul>
+
+            <h3>4. Counting Method</h3>
+
+            <div class="definition">
+                The counting method takes advantage of the fact that, generally, several contiguous blocks may be allocated or freed simultaneously. Instead of keeping a list of all free blocks, it keeps the address of the first free block and the count of contiguous free blocks.
+            </div>
+
+            <h4>How Counting Works</h4>
+            <ul>
+                <li>Stores pairs of (starting address, count)</li>
+                <li>Each entry represents a contiguous group of free blocks</li>
+                <li>Starting address: first block in the contiguous group</li>
+                <li>Count: number of free blocks in that group</li>
+                <li>List contains entries for all groups of free blocks</li>
+            </ul>
+
+            <h4>Advantages of Counting</h4>
+            <ul>
+                <li>Efficient for systems with contiguous allocation</li>
+                <li>Compact representation when free space is contiguous</li>
+                <li>Easy to find contiguous blocks of required size</li>
+                <li>Reduces storage overhead compared to listing each block</li>
+                <li>Works well with file systems that allocate multiple blocks</li>
+            </ul>
+
+            <h4>Disadvantages of Counting</h4>
+            <ul>
+                <li>Less efficient if free space is highly fragmented</li>
+                <li>Complexity in maintaining the list as blocks are allocated/freed</li>
+                <li>May require merging adjacent free regions</li>
+            </ul>
+
+            <div class="note">
+                <strong>Example:</strong> Instead of listing blocks 10, 11, 12, 13 as free, store (10, 4) meaning 4 contiguous free blocks starting at block 10.
+            </div>
+
+            <h3>Comparison of Free Space Management Methods</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Space Overhead</th>
+                        <th>Finding Free Blocks</th>
+                        <th>Best For</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Bit Vector</td>
+                        <td>1 bit per block</td>
+                        <td>Fast</td>
+                        <td>Small to medium disks</td>
+                    </tr>
+                    <tr>
+                        <td>Linked List</td>
+                        <td>Pointer per free block</td>
+                        <td>Slow for multiple blocks</td>
+                        <td>Simple allocation needs</td>
+                    </tr>
+                    <tr>
+                        <td>Grouping</td>
+                        <td>Moderate</td>
+                        <td>Moderate</td>
+                        <td>Bulk allocations</td>
+                    </tr>
+                    <tr>
+                        <td>Counting</td>
+                        <td>Low (if contiguous)</td>
+                        <td>Fast for contiguous blocks</td>
+                        <td>Contiguous allocation</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="important">
+                <strong>Key Point for Exams:</strong> Bit vector is most commonly used for its efficiency and simplicity. Linked list is simple but inefficient for finding multiple blocks. Grouping and counting are optimizations for specific allocation patterns.
+            </div>
+        </section>
+
+        <section id="disk">
+            <h2>6. Disk Structure and Disk Scheduling</h2>
+
+            <h3>Disk Structure</h3>
+
+            <div class="definition">
+                A hard disk consists of one or more circular platters coated with magnetic material. Data is stored on these platters in concentric circles called tracks. The disk structure includes tracks, sectors, and cylinders.
+            </div>
+
+            <h4>Components of Disk Structure</h4>
+
+            <h5>1. Tracks</h5>
+            <p>A track is a concentric circular path on the disk surface where data is recorded. Each platter surface is divided into multiple tracks numbered from the outermost to the innermost.</p>
+
+            <h5>2. Sectors</h5>
+            <p>A sector is the smallest addressable unit on a disk. Each track is divided into fixed-size sectors (typically 512 bytes or 4KB). Sectors are the basic unit of data transfer between disk and memory.</p>
+
+            <h5>3. Cylinders</h5>
+            <p>A cylinder is the set of all tracks at the same position on all platters. If a disk has multiple platters, tracks at the same distance from the center on all platters form a cylinder. Accessing data within the same cylinder is faster as it doesn't require head movement.</p>
+
+            <h5>4. Clusters</h5>
+            <p>A cluster (or block) is a group of sectors that the operating system uses as the smallest unit of disk allocation. File systems allocate space in clusters rather than individual sectors.</p>
+
+            <h3>Need for Disk Scheduling</h3>
+
+            <p>Disk scheduling is necessary because:</p>
+            <ul>
+                <li>Multiple processes may request disk I/O simultaneously</li>
+                <li>Disk access time depends on seek time, rotational latency, and transfer time</li>
+                <li>Mechanical movement (head seeking) is slow compared to electronic operations</li>
+                <li>Proper ordering of requests can minimize total access time</li>
+                <li>Improves overall system throughput and response time</li>
+                <li>Reduces average waiting time for I/O operations</li>
+            </ul>
+
+            <h4>Disk Access Time Components</h4>
+            <ul>
+                <li><strong>Seek Time:</strong> Time to move disk arm to the desired track (dominant factor)</li>
+                <li><strong>Rotational Latency:</strong> Time for desired sector to rotate under the read/write head</li>
+                <li><strong>Transfer Time:</strong> Time to actually read/write data</li>
+            </ul>
+
+            <h3>Disk Scheduling Algorithms</h3>
+
+            <h4>1. FCFS (First-Come, First-Served)</h4>
+
+            <div class="definition">
+                FCFS is the simplest disk scheduling algorithm. It processes disk requests in the order they arrive in the disk queue, without any reordering.
+            </div>
+
+            <h5>Characteristics of FCFS</h5>
+            <ul>
+                <li>Processes requests in arrival order</li>
+                <li>Fair - no starvation</li>
+                <li>Simple to implement</li>
+                <li>No optimization of seek time</li>
+                <li>Similar to FIFO queue</li>
+            </ul>
+
+            <h5>Advantages of FCFS</h5>
+            <ul>
+                <li>Simple and easy to implement</li>
+                <li>Fair - every request gets serviced in order</li>
+                <li>No starvation - all requests eventually serviced</li>
+                <li>Low overhead</li>
+            </ul>
+
+            <h5>Disadvantages of FCFS</h5>
+            <ul>
+                <li>Poor performance - high seek time</li>
+                <li>Does not optimize disk arm movement</li>
+                <li>Can result in wild swings of disk arm across the disk</li>
+                <li>Not suitable for systems with heavy I/O loads</li>
+            </ul>
+
+            <div class="note">
+                <strong>Example:</strong> Request queue: 98, 183, 37, 122, 14, 124, 65. Head at 53. FCFS services in order: 53→98→183→37→122→14→124→65.
+            </div>
+
+            <h4>2. SSTF (Shortest Seek Time First)</h4>
+
+            <div class="definition">
+                SSTF selects the request with the minimum seek time from the current head position. It always chooses the pending request closest to the current head position.
+            </div>
+
+            <h5>Characteristics of SSTF</h5>
+            <ul>
+                <li>Selects closest request to current position</li>
+                <li>Minimizes seek time for each individual request</li>
+                <li>Greedy algorithm approach</li>
+                <li>May cause starvation</li>
+            </ul>
+
+            <h5>Advantages of SSTF</h5>
+            <ul>
+                <li>Better performance than FCFS</li>
+                <li>Reduces average seek time</li>
+                <li>Improves throughput compared to FCFS</li>
+                <li>Reasonable for moderate loads</li>
+            </ul>
+
+            <h5>Disadvantages of SSTF</h5>
+            <ul>
+                <li>Can cause starvation of requests far from current position</li>
+                <li>Not optimal - doesn't minimize total seek time</li>
+                <li>Favors middle tracks over outer tracks</li>
+                <li>Overhead of searching for closest request</li>
+            </ul>
+
+            <div class="note">
+                <strong>Example:</strong> Request queue: 98, 183, 37, 122, 14, 124, 65. Head at 53. SSTF order: 53→65→37→14→98→122→124→183 (always choosing closest).
+            </div>
+
+            <h4>3. SCAN (Elevator Algorithm)</h4>
+
+            <div class="definition">
+                SCAN algorithm moves the disk arm in one direction, servicing all requests in that direction until it reaches the end, then reverses direction and services requests in the opposite direction.
+            </div>
+
+            <h5>Characteristics of SCAN</h5>
+            <ul>
+                <li>Disk arm moves like an elevator - one direction then reverses</li>
+                <li>Services all requests in current direction of movement</li>
+                <li>Changes direction at disk boundaries (0 and max cylinder)</li>
+                <li>Also called Elevator Algorithm</li>
+            </ul>
+
+            <h5>Advantages of SCAN</h5>
+            <ul>
+                <li>Better than FCFS and SSTF in terms of fairness</li>
+                <li>Eliminates starvation - all requests eventually serviced</li>
+                <li>Provides more uniform wait times</li>
+                <li>Good for systems with heavy disk loads</li>
+                <li>Predictable performance</li>
+            </ul>
+
+            <h5>Disadvantages of SCAN</h5>
+            <ul>
+                <li>Long waiting time for requests just visited</li>
+                <li>Unfair to locations recently visited</li>
+                <li>May cause unnecessary travel to disk ends</li>
+                <li>Cylinders in middle get better service than ends</li>
+            </ul>
+
+            <div class="note">
+                <strong>Example:</strong> Request queue: 98, 183, 37, 122, 14, 124, 65. Head at 53, moving towards 0. SCAN order: 53→37→14→0→65→98→122→124→183.
+            </div>
+
+            <h4>4. C-SCAN (Circular SCAN)</h4>
+
+            <div class="definition">
+                C-SCAN is a variant of SCAN that provides more uniform wait time. The head moves in one direction servicing requests, and when it reaches the end, it immediately returns to the beginning without servicing requests on the return trip.
+            </div>
+
+            <h5>Characteristics of C-SCAN</h5>
+            <ul>
+                <li>Moves in one direction only (typically outer to inner)</li>
+                <li>Services requests while moving in that direction</li>
+                <li>Returns to start without servicing on return trip</li>
+                <li>Treats cylinders as circular list</li>
+                <li>More uniform wait times than SCAN</li>
+            </ul>
+
+            <h5>Advantages of C-SCAN</h5>
+            <ul>
+                <li>More uniform wait time than SCAN</li>
+                <li>Eliminates bias against innermost and outermost tracks</li>
+                <li>All locations receive similar service</li>
+                <li>Predictable service time</li>
+            </ul>
+
+            <h5>Disadvantages of C-SCAN</h5>
+            <ul>
+                <li>May waste time on return trip without servicing</li>
+                <li>Slightly more travel time than SCAN</li>
+                <li>More complex implementation than SCAN</li>
+            </ul>
+
+            <div class="note">
+                <strong>Example:</strong> Request queue: 98, 183, 37, 122, 14, 124, 65. Head at 53, moving towards 199. C-SCAN order: 53→65→98→122→124→183→199→0→14→37.
+            </div>
+
+            <h3>Comparison of Disk Scheduling Algorithms</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Algorithm</th>
+                        <th>Seek Time</th>
+                        <th>Starvation</th>
+                        <th>Fairness</th>
+                        <th>Complexity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>FCFS</td>
+                        <td>High</td>
+                        <td>No</td>
+                        <td>Excellent</td>
+                        <td>Simple</td>
+                    </tr>
+                    <tr>
+                        <td>SSTF</td>
+                        <td>Low</td>
+                        <td>Possible</td>
+                        <td>Poor</td>
+                        <td>Moderate</td>
+                    </tr>
+                    <tr>
+                        <td>SCAN</td>
+                        <td>Moderate</td>
+                        <td>No</td>
+                        <td>Good</td>
+                        <td>Moderate</td>
+                    </tr>
+                    <tr>
+                        <td>C-SCAN</td>
+                        <td>Moderate</td>
+                        <td>No</td>
+                        <td>Very Good</td>
+                        <td>Moderate</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="important">
+                <strong>Remember for Exams:</strong> FCFS is simplest but inefficient; SSTF reduces seek time but may starve requests; SCAN eliminates starvation with elevator-like movement; C-SCAN provides most uniform service by treating disk as circular.
+            </div>
+        </section>
+
+        <section id="io-management">
+            <h2>7. I/O Management</h2>
+
+            <div class="definition">
+                I/O management is the part of the operating system that handles input/output operations. It provides an interface between the hardware devices and the rest of the system, managing data transfer between devices and memory.
+            </div>
+
+            <h3>I/O Hardware Basics</h3>
+
+            <h4>Components of I/O Hardware</h4>
+
+            <h5>1. I/O Devices</h5>
+            <p>Peripheral devices that communicate with the computer system. Categories include:</p>
+            <ul>
+                <li><strong>Storage Devices:</strong> Hard disks, SSDs, USB drives, optical drives</li>
+                <li><strong>Communication Devices:</strong> Network cards, modems, Bluetooth adapters</li>
+                <li><strong>Human Interface Devices:</strong> Keyboard, mouse, monitor, printer</li>
+            </ul>
+
+            <h5>2. Device Controllers</h5>
+            <p>Hardware units that control the operation of I/O devices. Each device controller:</p>
+            <ul>
+                <li>Has control registers that CPU can read and write</li>
+                <li>Has data buffer for storing data being transferred</li>
+                <li>Has status registers indicating device state</li>
+                <li>Communicates with the device it controls</li>
+                <li>Communicates with the CPU through device drivers</li>
+            </ul>
+
+            <h5>3. I/O Ports</h5>
+            <p>Connection points between I/O devices and the system. Include:</p>
+            <ul>
+                <li>Data register: holds data being transferred</li>
+                <li>Status register: contains status information</li>
+                <li>Control register: receives commands from CPU</li>
+            </ul>
+
+            <h4>I/O Communication Methods</h4>
+
+            <h5>1. Port-Mapped I/O</h5>
+            <p>Uses separate address space for I/O devices. Special I/O instructions are used to access device registers.</p>
+
+            <h5>2. Memory-Mapped I/O</h5>
+            <p>Device registers are mapped to memory addresses. Standard memory access instructions can access devices. More flexible and commonly used in modern systems.</p>
+
+            <h3>Device Drivers</h3>
+
+            <div class="definition">
+                A device driver is software that provides a uniform interface between the operating system and the hardware device. It translates generic I/O requests into device-specific commands.
+            </div>
+
+            <h4>Functions of Device Drivers</h4>
+            <ul>
+                <li><strong>Device Initialization:</strong> Sets up device for operation</li>
+                <li><strong>Command Translation:</strong> Converts OS commands to device-specific commands</li>
+                <li><strong>Data Transfer:</strong> Manages data movement between device and memory</li>
+                <li><strong>Status Monitoring:</strong> Checks device status and reports errors</li>
+                <li><strong>Error Handling:</strong> Handles device errors and retries operations</li>
+                <li><strong>Interrupt Handling:</strong> Responds to interrupts from devices</li>
+            </ul>
+
+            <h4>Device Driver Architecture</h4>
+            <p>Device drivers typically have two parts:</p>
+            <ul>
+                <li><strong>Top Half:</strong> Runs in process context, handles requests from applications</li>
+                <li><strong>Bottom Half:</strong> Runs in interrupt context, handles hardware interrupts</li>
+            </ul>
+
+            <h3>Interrupt-Driven I/O</h3>
+
+            <div class="definition">
+                Interrupt-driven I/O allows the CPU to continue executing other tasks while waiting for I/O operations to complete. The device signals the CPU via an interrupt when the operation is finished.
+            </div>
+
+            <h4>How Interrupt-Driven I/O Works</h4>
+            <ol>
+                <li>CPU initiates I/O operation by sending command to device controller</li>
+                <li>CPU continues executing other processes (doesn't wait)</li>
+                <li>Device controller performs the I/O operation</li>
+                <li>When operation completes, controller sends interrupt signal to CPU</li>
+                <li>CPU suspends current task and saves its state</li>
+                <li>CPU executes interrupt handler routine</li>
+                <li>Interrupt handler processes the I/O completion</li>
+                <li>CPU restores previous task and continues execution</li>
+            </ol>
+
+            <h4>Advantages of Interrupt-Driven I/O</h4>
+            <ul>
+                <li>Efficient CPU utilization - no busy waiting</li>
+                <li>CPU can perform other tasks during I/O</li>
+                <li>Better system responsiveness</li>
+                <li>Suitable for slow I/O devices</li>
+                <li>Reduces CPU idle time</li>
+            </ul>
+
+            <h4>Disadvantages of Interrupt-Driven I/O</h4>
+            <ul>
+                <li>Context switching overhead</li>
+                <li>Interrupt handling overhead</li>
+                <li>Complex implementation</li>
+                <li>May be inefficient for very fast devices</li>
+            </ul>
+
+            <h3>Direct Memory Access (DMA)</h3>
+
+            <div class="definition">
+                DMA is a method that allows I/O devices to transfer data directly to or from memory without CPU intervention. A DMA controller manages the data transfer, freeing the CPU for other tasks.
+            </div>
+
+            <h4>How DMA Works</h4>
+            <ol>
+                <li>CPU initiates DMA transfer by providing:
+                    <ul>
+                        <li>Source address (device or memory)</li>
+                        <li>Destination address (memory or device)</li>
+                        <li>Number of bytes to transfer</li>
+                    </ul>
+                </li>
+                <li>DMA controller takes over the system bus</li>
+                <li>DMA controller transfers data directly between device and memory</li>
+                <li>CPU is free to execute other processes during transfer</li>
+                <li>When transfer completes, DMA controller sends interrupt to CPU</li>
+                <li>CPU processes the interrupt and acknowledges completion</li>
+            </ol>
+
+            <h4>DMA Transfer Modes</h4>
+            <ul>
+                <li><strong>Burst Mode:</strong> DMA controller takes control and transfers entire block at once</li>
+                <li><strong>Cycle Stealing:</strong> DMA controller transfers one byte/word at a time, alternating with CPU</li>
+                <li><strong>Transparent Mode:</strong> DMA transfers only when CPU is not using the bus</li>
+            </ul>
+
+            <h4>Advantages of DMA</h4>
+            <ul>
+                <li>Frees CPU from data transfer tasks</li>
+                <li>Very efficient for large data transfers</li>
+                <li>Reduces CPU overhead significantly</li>
+                <li>Faster data transfer compared to programmed I/O</li>
+                <li>Essential for high-speed devices</li>
+            </ul>
+
+            <h4>Disadvantages of DMA</h4>
+            <ul>
+                <li>Requires additional hardware (DMA controller)</li>
+                <li>More complex than other I/O methods</li>
+                <li>May cause cache coherency issues</li>
+                <li>Bus contention with CPU</li>
+            </ul>
+
+            <h3>Comparison of I/O Methods</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>CPU Involvement</th>
+                        <th>Speed</th>
+                        <th>Best For</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Programmed I/O</td>
+                        <td>High (busy waiting)</td>
+                        <td>Slow</td>
+                        <td>Simple, slow devices</td>
+                    </tr>
+                    <tr>
+                        <td>Interrupt-Driven</td>
+                        <td>Medium (per byte)</td>
+                        <td>Moderate</td>
+                        <td>Moderate-speed devices</td>
+                    </tr>
+                    <tr>
+                        <td>DMA</td>
+                        <td>Low (setup only)</td>
+                        <td>Fast</td>
+                        <td>High-speed, bulk transfers</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="important">
+                <strong>Key Point for Exams:</strong> Device drivers provide abstraction between OS and hardware; Interrupt-driven I/O eliminates busy waiting; DMA allows direct data transfer without CPU intervention, ideal for high-speed devices and large data transfers.
+            </div>
+        </section>
+
+        <section id="buffering">
+            <h2>8. I/O Buffering and Caching</h2>
+
+            <h3>Buffering</h3>
+
+            <div class="definition">
+                Buffering is a technique where data is temporarily stored in a memory area (buffer) while being transferred between two devices or between a device and an application. It compensates for speed differences and coordinates data transfer.
+            </div>
+
+            <h4>Need for Buffering</h4>
+            <ul>
+                <li>Speed mismatch between producer and consumer of data</li>
+                <li>Different data transfer sizes between device and application</li>
+                <li>Adaptation for devices with different data transfer rates</li>
+                <li>Support for copy semantics - data can be modified after write call returns</li>
+                <li>Smooth out variations in device processing times</li>
+            </ul>
+
+            <h3>Types of Buffering</h3>
+
+            <h4>1. Single Buffering</h4>
+
+            <div class="definition">
+                In single buffering, one buffer is used to hold data between the device and the process. While one block is being processed, the next block is being read into the buffer.
+            </div>
+
+            <h5>How Single Buffering Works</h5>
+            <ul>
+                <li>Operating system assigns one buffer to I/O operation</li>
+                <li>Device transfers data to buffer</li>
+                <li>Process reads from buffer while next block is being transferred</li>
+                <li>Cannot handle bidirectional data flow efficiently</li>
+            </ul>
+
+            <h5>Advantages of Single Buffering</h5>
+            <ul>
+                <li>Simple implementation</li>
+                <li>Reduces waiting time compared to no buffering</li>
+                <li>Minimal memory overhead</li>
+                <li>Allows overlap of I/O and processing</li>
+            </ul>
+
+            <h5>Disadvantages of Single Buffering</h5>
+            <ul>
+                <li>Limited concurrency - device must wait if buffer is full</li>
+                <li>Process must wait if buffer is empty</li>
+                <li>Not efficient for continuous data streams</li>
+            </ul>
+
+            <h4>2. Double Buffering</h4>
+
+            <div class="definition">
+                Double buffering uses two buffers. While one buffer is being filled by the device, the other is being emptied by the process. When complete, they swap roles.
+            </div>
+
+            <h5>How Double Buffering Works</h5>
+            <ul>
+                <li>Two buffers allocated: Buffer A and Buffer B</li>
+                <li>Device fills Buffer A while process reads from Buffer B</li>
+                <li>When both operations complete, buffers swap roles</li>
+                <li>Provides continuous data flow</li>
+                <li>Also called buffer swapping</li>
+            </ul>
+
+            <h5>Advantages of Double Buffering</h5>
+            <ul>
+                <li>Better performance than single buffering</li>
+                <li>Allows continuous I/O operations</li>
+                <li>Reduces waiting time significantly</li>
+                <li>Good for streaming data</li>
+                <li>Device and process can work simultaneously</li>
+            </ul>
+
+            <h5>Disadvantages of Double Buffering</h5>
+            <ul>
+                <li>Requires twice the memory of single buffering</li>
+                <li>More complex implementation</li>
+                <li>Additional overhead for buffer management</li>
+            </ul>
+
+            <h4>3. Circular Buffering (Multiple Buffering)</h4>
+
+            <div class="definition">
+                Circular buffering uses more than two buffers arranged in a circular queue. This provides even more flexibility and smoother data flow than double buffering.
+            </div>
+
+            <h5>How Circular Buffering Works</h5>
+            <ul>
+                <li>Multiple buffers (typically 3 or more) arranged in circular queue</li>
+                <li>Producer fills buffers sequentially</li>
+                <li>Consumer empties buffers sequentially</li>
+                <li>Wraps around when reaching end of buffer pool</li>
+                <li>Can handle variations in production and consumption rates</li>
+            </ul>
+
+            <h5>Advantages of Circular Buffering</h5>
+            <ul>
+                <li>Maximum throughput and efficiency</li>
+                <li>Handles burst traffic well</li>
+                <li>Smooths out speed variations</li>
+                <li>Provides best performance for continuous data streams</li>
+            </ul>
+
+            <h5>Disadvantages of Circular Buffering</h5>
+            <ul>
+                <li>Highest memory overhead</li>
+                <li>Most complex implementation</li>
+                <li>May waste memory if buffers underutilized</li>
+            </ul>
+
+            <h3>Caching</h3>
+
+            <div class="definition">
+                Caching involves keeping a copy of frequently accessed data in a faster storage area (cache). Unlike buffering, which is temporary storage during transfer, caching stores data for potential reuse.
+            </div>
+
+            <h4>How Caching Works</h4>
+            <ul>
+                <li>Frequently accessed data is copied to cache</li>
+                <li>On data access, cache is checked first</li>
+                <li>If data found in cache (hit), it's retrieved quickly</li>
+                <li>If not found (miss), data is retrieved from slower storage and may be cached</li>
+                <li>Cache replacement algorithms determine what to keep in cache</li>
+            </ul>
+
+            <h4>Types of Caches</h4>
+            <ul>
+                <li><strong>Disk Cache:</strong> Memory used to cache frequently accessed disk blocks</li>
+                <li><strong>Page Cache:</strong> Caches file system pages in memory</li>
+                <li><strong>Buffer Cache:</strong> Caches file system metadata and blocks</li>
+            </ul>
+
+            <h4>Advantages of Caching</h4>
+            <ul>
+                <li>Significantly improves access speed</li>
+                <li>Reduces I/O operations to slower storage</li>
+                <li>Exploits locality of reference</li>
+                <li>Improves overall system performance</li>
+                <li>Reduces wear on storage devices</li>
+            </ul>
+
+            <h4>Disadvantages of Caching</h4>
+            <ul>
+                <li>Consistency issues - cache and storage may differ</li>
+                <li>Memory overhead for cache</li>
+                <li>Cache management overhead</li>
+                <li>Complex implementation</li>
+            </ul>
+
+            <h3>Difference Between Buffering and Caching</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Buffering</th>
+                        <th>Caching</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Purpose</td>
+                        <td>Temporary storage during transfer</td>
+                        <td>Store frequently accessed data for reuse</td>
+                    </tr>
+                    <tr>
+                        <td>Data Flow</td>
+                        <td>One-time use (write once, read once)</td>
+                        <td>Multiple reuse (read many times)</td>
+                    </tr>
+                    <tr>
+                        <td>Size</td>
+                        <td>Typically smaller</td>
+                        <td>Can be larger</td>
+                    </tr>
+                    <tr>
+                        <td>Speed Focus</td>
+                        <td>Matching transfer rates</td>
+                        <td>Fast access to frequent data</td>
+                    </tr>
+                    <tr>
+                        <td>Data Lifetime</td>
+                        <td>Short (until transferred)</td>
+                        <td>Longer (until replaced)</td>
+                    </tr>
+                    <tr>
+                        <td>Example</td>
+                        <td>Keyboard buffer, print buffer</td>
+                        <td>Disk cache, web cache</td>
+                    </tr>
+                    <tr>
+                        <td>Replacement</td>
+                        <td>Usually FIFO</td>
+                        <td>LRU, LFU, etc.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="important">
+                <strong>Remember for Exams:</strong> Buffering is for speed matching during transfer (temporary storage); Caching is for fast access to frequently used data (performance optimization). Single buffering is simple but less efficient; Double buffering provides better overlap; Circular buffering offers maximum throughput.
+            </div>
+        </section>
+
+        <section id="protection">
+            <h2>9. Protection and Security in File System</h2>
+
+            <div class="definition">
+                File protection is the mechanism that controls access to files, ensuring that only authorized users can perform permitted operations. It prevents unauthorized access, modification, or deletion of files.
+            </div>
+
+            <h3>File Protection</h3>
+
+            <h4>Need for File Protection</h4>
+            <ul>
+                <li>Prevent unauthorized access to sensitive information</li>
+                <li>Ensure data confidentiality and privacy</li>
+                <li>Maintain data integrity - prevent unauthorized modifications</li>
+                <li>Control file sharing among users</li>
+                <li>Protect against accidental or malicious damage</li>
+                <li>Comply with security policies and regulations</li>
+            </ul>
+
+            <h4>Types of File Access</h4>
+            <p>Common operations that may need to be controlled:</p>
+            <ul>
+                <li><strong>Read:</strong> View file contents without modification</li>
+                <li><strong>Write:</strong> Modify or update file contents</li>
+                <li><strong>Execute:</strong> Load and run program files</li>
+                <li><strong>Append:</strong> Add data to end of file without modifying existing content</li>
+                <li><strong>Delete:</strong> Remove file from file system</li>
+                <li><strong>List:</strong> View file name and attributes</li>
+            </ul>
+
+            <h3>Access Control</h3>
+
+            <div class="definition">
+                Access control is the mechanism that determines which users can access which files and what operations they can perform. It enforces file protection policies.
+            </div>
+
+            <h4>Access Control Methods</h4>
+
+            <h5>1. Access Control Lists (ACL)</h5>
+            <p>Each file has a list of users and their permitted operations:</p>
+            <ul>
+                <li>List contains (user, rights) pairs</li>
+                <li>Very flexible - different rights for each user</li>
+                <li>Can specify complex access patterns</li>
+                <li>Overhead of maintaining and checking large lists</li>
+                <li>Requires substantial storage space for large systems</li>
+            </ul>
+
+            <h5>2. Capability Lists</h5>
+            <p>Each user has a list of files and permitted operations:</p>
+            <ul>
+                <li>User carries capabilities (tickets) for each file</li>
+                <li>Capability specifies file and allowed operations</li>
+                <li>Fast access checking</li>
+                <li>Difficult to revoke access</li>
+                <li>Security concerns if capabilities stolen</li>
+            </ul>
+
+            <h5>3. Password Protection</h5>
+            <p>Files protected by passwords:</p>
+            <ul>
+                <li>User must know password to access file</li>
+                <li>Can have different passwords for different operations</li>
+                <li>Simple but not very secure</li>
+                <li>Password management overhead</li>
+            </ul>
+
+            <h3>User and Group Permissions</h3>
+
+            <div class="definition">
+                Most operating systems use a simplified approach with three classes of users: owner, group, and others. Each class has specific permissions for each file.
+            </div>
+
+            <h4>Permission Model</h4>
+
+            <h5>User Classes</h5>
+            <ul>
+                <li><strong>Owner (User):</strong> The user who created the file; has full control</li>
+                <li><strong>Group:</strong> A set of users who share access to the file; defined by system administrator</li>
+                <li><strong>Others (World):</strong> All other users on the system; general public access</li>
+            </ul>
+
+            <h5>Permission Types</h5>
+            <ul>
+                <li><strong>Read (r):</strong> Permission to read file contents or list directory</li>
+                <li><strong>Write (w):</strong> Permission to modify file or create/delete files in directory</li>
+                <li><strong>Execute (x):</strong> Permission to execute file or access directory</li>
+            </ul>
+
+            <h4>Permission Representation</h4>
+            <p>Permissions are typically represented in two ways:</p>
+
+            <h5>1. Symbolic Notation</h5>
+            <p>Example: rwxr-xr-- means:</p>
+            <ul>
+                <li>Owner: read, write, execute (rwx)</li>
+                <li>Group: read, execute (r-x)</li>
+                <li>Others: read only (r--)</li>
+            </ul>
+
+            <h5>2. Octal Notation</h5>
+            <p>Each permission set represented by a digit (0-7):</p>
+            <ul>
+                <li>Read = 4, Write = 2, Execute = 1</li>
+                <li>Example: 754 means rwxr-xr--</li>
+                <li>Owner: 7 (4+2+1 = rwx)</li>
+                <li>Group: 5 (4+1 = r-x)</li>
+                <li>Others: 4 (r--)</li>
+            </ul>
+
+            <h4>Advanced Protection Features</h4>
+
+            <h5>1. SUID (Set User ID)</h5>
+            <p>When executed, program runs with permissions of file owner rather than user who executed it. Allows temporary privilege elevation for specific tasks.</p>
+
+            <h5>2. SGID (Set Group ID)</h5>
+            <p>Similar to SUID but for group permissions. Files created in SGID directory inherit the directory's group.</p>
+
+            <h5>3. Sticky Bit</h5>
+            <p>On directories, prevents users from deleting files they don't own. Commonly used on shared directories like /tmp.</p>
+
+            <h3>File System Security</h3>
+
+            <h4>Security Threats</h4>
+            <ul>
+                <li><strong>Unauthorized Access:</strong> Users accessing files without permission</li>
+                <li><strong>Data Leakage:</strong> Sensitive information exposed to unauthorized users</li>
+                <li><strong>Data Corruption:</strong> Intentional or accidental damage to files</li>
+                <li><strong>Malware:</strong> Viruses, trojans, or ransomware affecting files</li>
+                <li><strong>Denial of Service:</strong> Preventing legitimate access to files</li>
+            </ul>
+
+            <h4>Security Mechanisms</h4>
+            <ul>
+                <li><strong>Encryption:</strong> Protect file contents from unauthorized viewing</li>
+                <li><strong>Authentication:</strong> Verify user identity before granting access</li>
+                <li><strong>Audit Trails:</strong> Log file access and modifications for accountability</li>
+                <li><strong>Backup and Recovery:</strong> Protect against data loss</li>
+                <li><strong>Antivirus:</strong> Detect and remove malicious software</li>
+            </ul>
+
+            <h3>File Integrity</h3>
+
+            <h4>Ensuring File Integrity</h4>
+            <ul>
+                <li><strong>Checksums:</strong> Detect accidental changes or corruption</li>
+                <li><strong>Digital Signatures:</strong> Verify file authenticity and integrity</li>
+                <li><strong>Version Control:</strong> Track changes and allow rollback</li>
+                <li><strong>Access Logging:</strong> Monitor who accessed or modified files</li>
+                <li><strong>Write Protection:</strong> Prevent modification of critical files</li>
+            </ul>
+
+            <div class="important">
+                <strong>Key Points for Exams:</strong>
+                <ul>
+                    <li>File protection controls who can access files and what operations they can perform</li>
+                    <li>Three user classes: Owner, Group, Others</li>
+                    <li>Three permission types: Read, Write, Execute</li>
+                    <li>Permissions can be represented symbolically (rwx) or octally (0-7)</li>
+                    <li>ACLs provide fine-grained control but have higher overhead</li>
+                    <li>Security requires combination of authentication, authorization, and audit</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="exam" class="exam-focus">
+            <h2>10. Exam Focus Box</h2>
+
+            <h3>Important Definitions to Memorize</h3>
+            <ul>
+                <li><strong>File:</strong> Named collection of related information recorded on secondary storage</li>
+                <li><strong>Directory:</strong> Container storing information about files and organizing them hierarchically</li>
+                <li><strong>Sequential Access:</strong> Records accessed in order, one after another</li>
+                <li><strong>Direct Access:</strong> Records accessed in any order using their addresses</li>
+                <li><strong>Indexed Access:</strong> Uses index to locate records quickly</li>
+                <li><strong>Contiguous Allocation:</strong> File stored in consecutive disk blocks</li>
+                <li><strong>Linked Allocation:</strong> File stored as linked list of blocks</li>
+                <li><strong>Indexed Allocation:</strong> All pointers stored in index block</li>
+                <li><strong>Disk Scheduling:</strong> Ordering disk I/O requests to minimize seek time</li>
+                <li><strong>DMA:</strong> Direct data transfer between device and memory without CPU</li>
+                <li><strong>Buffering:</strong> Temporary storage during data transfer</li>
+                <li><strong>Caching:</strong> Storing frequently accessed data for reuse</li>
+                <li><strong>File Protection:</strong> Controlling access to prevent unauthorized operations</li>
+            </ul>
+
+            <h3>Frequently Asked AKTU Questions from Unit 5</h3>
+            <ul>
+                <li>Define file and explain file attributes and operations</li>
+                <li>Compare sequential, direct, and indexed file access methods</li>
+                <li>Explain different directory structures with advantages and disadvantages</li>
+                <li>Compare single-level, two-level, and tree-structured directories</li>
+                <li>Explain file allocation methods: contiguous, linked, and indexed</li>
+                <li>Compare contiguous, linked, and indexed allocation with table</li>
+                <li>Explain free space management techniques</li>
+                <li>What is disk scheduling? Why is it needed?</li>
+                <li>Explain FCFS, SSTF, SCAN, and C-SCAN disk scheduling algorithms</li>
+                <li>Compare disk scheduling algorithms</li>
+                <li>Explain DMA and its advantages over interrupt-driven I/O</li>
+                <li>What are device drivers? Explain their role</li>
+                <li>Differentiate between buffering and caching</li>
+                <li>Explain types of buffering: single, double, and circular</li>
+                <li>Explain file protection and access control mechanisms</li>
+                <li>Describe user and group permissions in file systems</li>
+            </ul>
+
+            <h3>Keywords to Use in Answers</h3>
+            <ul>
+                <li>File attributes, file operations, directory entry</li>
+                <li>Sequential order, random access, index lookup</li>
+                <li>Single-level, two-level, hierarchical, acyclic graph</li>
+                <li>Contiguous blocks, linked list, index block</li>
+                <li>External fragmentation, internal fragmentation</li>
+                <li>Bit vector, free block list, grouping, counting</li>
+                <li>Seek time, rotational latency, transfer time</li>
+                <li>Tracks, sectors, cylinders, platters</li>
+                <li>FCFS, SSTF, SCAN, C-SCAN, elevator algorithm</li>
+                <li>Device controller, device driver, interrupt handler</li>
+                <li>Programmed I/O, interrupt-driven, DMA</li>
+                <li>Single buffer, double buffer, circular buffer</li>
+                <li>Cache hit, cache miss, locality of reference</li>
+                <li>Access control, permissions, owner, group, others</li>
+                <li>Read, write, execute, ACL, authentication</li>
+            </ul>
+
+            <h3>Common Mistakes Students Make</h3>
+            <ul>
+                <li>Confusing file attributes with file operations - attributes are properties, operations are actions</li>
+                <li>Mixing up sequential and direct access - sequential is ordered, direct is random</li>
+                <li>Not clearly distinguishing directory structures - remember single-level has one directory, two-level has user directories, tree is hierarchical</li>
+                <li>Confusing allocation methods - contiguous is consecutive, linked uses pointers, indexed has index block</li>
+                <li>Not mentioning fragmentation correctly - contiguous has external, linked has none, indexed has none</li>
+                <li>Mixing disk scheduling algorithms - FCFS is order, SSTF is closest, SCAN is elevator, C-SCAN is circular</li>
+                <li>Confusing buffering and caching - buffering is temporary during transfer, caching is for reuse</li>
+                <li>Not explaining DMA advantages - emphasize CPU is freed for other tasks</li>
+                <li>Missing permission classes - always mention owner, group, others</li>
+                <li>Forgetting to mention both advantages and disadvantages when comparing</li>
+            </ul>
+
+            <h3>Answer Writing Tips</h3>
+            <ul>
+                <li>For file operations, mention at least 6-7 operations: create, write, read, seek, delete, truncate, open, close</li>
+                <li>When comparing access methods or allocation methods, always use tables</li>
+                <li>For directory structures, draw simple diagrams to illustrate the hierarchy</li>
+                <li>When explaining disk scheduling, use examples with request queues and head positions</li>
+                <li>For DMA, clearly explain the three steps: CPU initiates, DMA transfers, interrupt signals completion</li>
+                <li>Always mention why something is needed before explaining how it works</li>
+                <li>For comparison questions, create clear tables with meaningful categories</li>
+                <li>Define technical terms before using them in explanations</li>
+                <li>Use examples to illustrate concepts, especially for scheduling algorithms</li>
+                <li>Conclude with practical applications or significance</li>
+            </ul>
+   <h3>High-Weightage Topics</h3>
+        <ul>
+            <li>File allocation methods comparison - 7 to 10 marks</li>
+            <li>Disk scheduling algorithms (explain any two) - 10 marks</li>
+            <li>Directory structures with advantages/disadvantages - 7 marks</li>
+            <li>File access methods comparison - 7 marks</li>
+            <li>DMA and interrupt-driven I/O - 7 marks</li>
+            <li>Buffering types and buffering vs caching - 7 marks</li>
+            <li>Free space management techniques - 5 to 7 marks</li>
+            <li>File protection and permissions - 5 to 7 marks</li>
+        </ul>
+
+        <h3>Quick Revision Points</h3>
+        <ul>
+            <li>File: named collection on secondary storage with attributes and operations</li>
+            <li>Access methods: Sequential (ordered), Direct (random), Indexed (via index)</li>
+            <li>Directories: Single-level (one for all), Two-level (per user), Tree (hierarchical), Acyclic (with sharing)</li>
+            <li>Allocation: Contiguous (consecutive), Linked (pointers), Indexed (index block)</li>
+            <li>Fragmentation: Contiguous→external; Linked→none; Indexed→none</li>
+            <li>Free space: Bit vector (bitmap), Linked list (free blocks chained), Grouping (multiple addresses), Counting (address+count)</li>
+            <li>Disk structure: Platters, tracks, sectors, cylinders</li>
+            <li>Scheduling: FCFS (order), SSTF (closest), SCAN (elevator), C-SCAN (circular)</li>
+            <li>I/O: Programmed (busy wait), Interrupt-driven (CPU freed), DMA (direct transfer)</li>
+            <li>Buffering: Single (one buffer), Double (two buffers), Circular (multiple buffers)</li>
+            <li>Caching: stores frequently used data for fast reuse</li>
+            <li>Protection: Owner, Group, Others with Read, Write, Execute permissions</li>
+        </ul>
+
+        <h3>Formulas and Calculations to Remember</h3>
+        <ul>
+            <li>Disk access time = Seek time + Rotational latency + Transfer time</li>
+            <li>Total seek distance = Sum of all head movements</li>
+            <li>Average seek time = Total seek distance / Number of requests</li>
+            <li>Permission octal: Read=4, Write=2, Execute=1</li>
+        </ul>
+
+        <h3>Last-Minute Memory Tricks</h3>
+        <ul>
+            <li><strong>Access Methods:</strong> SDI (Sequential, Direct, Indexed)</li>
+            <li><strong>Directory Levels:</strong> STT-A (Single, Two, Tree, Acyclic)</li>
+            <li><strong>Allocation Methods:</strong> CLI (Contiguous, Linked, Indexed)</li>
+            <li><strong>Disk Scheduling:</strong> FSSC (FCFS, SSTF, SCAN, C-SCAN)</li>
+            <li><strong>I/O Methods:</strong> PID (Programmed, Interrupt, DMA)</li>
+            <li><strong>Buffer Types:</strong> SDC (Single, Double, Circular)</li>
+            <li><strong>User Classes:</strong> OGO (Owner, Group, Others)</li>
+            <li><strong>Permissions:</strong> RWX (Read, Write, Execute)</li>
+        </ul>
+    </section>
+</main>
+
+<footer>
+    <p>Prepared for AKTU B.Tech CSE – Operating System Unit 5: File System & I/O Management</p>
+    <p>Master File Systems and I/O, Excel in Your Exams - Best Wishes!</p>
+</footer>
+
+<script>
+    window.onbeforeprint = function () {
+        alert("Printing is disabled. Please view the content on the website.");
+    };
+    
+    document.addEventListener("contextmenu", function(e) {
+        e.preventDefault();
+    });
+
+    document.addEventListener("keydown", function(e) {
+        if (e.ctrlKey && e.key === 'p') {
+            e.preventDefault();
+            alert("Printing is disabled. Please view the content on the website.");
+        }
+        if (e.ctrlKey && e.key === 's') {
+            e.preventDefault();
+            alert("Saving is disabled. Please view the content on the website.");
+        }
+    });
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+</script>

@@ -1,0 +1,907 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operating System – Unit 1 | Introduction to Operating System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            background-color: #f5f7fa;
+            color: #2c3e50;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        nav {
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+
+        nav h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        nav ul {
+            list-style: none;
+        }
+
+        nav ul li {
+            margin: 10px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        nav ul li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        nav a {
+            color: #2c3e50;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #667eea;
+        }
+
+        main {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        section {
+            margin-bottom: 50px;
+        }
+
+        h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        h3 {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        h4 {
+            color: #2c3e50;
+            font-size: 1.2em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .definition {
+            background-color: #e8f4f8;
+            border-left: 5px solid #667eea;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .definition strong {
+            color: #667eea;
+            font-size: 1.1em;
+        }
+
+        ul, ol {
+            margin-left: 40px;
+            margin-bottom: 20px;
+        }
+
+        ul li, ol li {
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        table th {
+            background-color: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        table td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        table tr:hover {
+            background-color: #f5f7fa;
+        }
+
+        .exam-focus {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .exam-focus h3 {
+            color: #d63031;
+            margin-top: 0;
+        }
+
+        .highlight {
+            background-color: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            background-color: #2c3e50;
+            color: white;
+            border-radius: 10px;
+            margin-top: 40px;
+        }
+
+        @media print {
+            body {
+                display: none !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            header h1 {
+                font-size: 1.6em;
+            }
+
+            main {
+                padding: 20px;
+            }
+
+            h2 {
+                font-size: 1.6em;
+            }
+
+            h3 {
+                font-size: 1.3em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Operating System – Unit 1</h1>
+        <p>Introduction to Operating System</p>
+        <p>AKTU B.Tech CSE – Exam Oriented Notes</p>
+    </header>
+
+    <nav>
+        <h2>Table of Contents</h2>
+        <ul>
+            <li><a href="#introduction">Introduction to Operating System</a></li>
+            <li><a href="#functions">Functions of Operating System</a></li>
+            <li><a href="#types">Types of Operating Systems</a></li>
+            <li><a href="#structure">Operating System Structure</a></li>
+            <li><a href="#modes">User Mode and Kernel Mode</a></li>
+            <li><a href="#system-calls">System Calls</a></li>
+            <li><a href="#services">Operating System Services</a></li>
+            <li><a href="#booting">Booting of Operating System</a></li>
+            <li><a href="#exam-focus">Exam Focus Box</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="introduction">
+            <h2>1. Introduction to Operating System</h2>
+            
+            <h3>1.1 Definition of Operating System</h3>
+            <div class="definition">
+                <strong>Operating System:</strong> An operating system is a system software that acts as an intermediary between the computer hardware and the user. It manages computer hardware resources and provides common services for computer programs.
+            </div>
+            <p>An operating system is the most important software that runs on a computer. It controls all the basic tasks such as managing files, memory, processes, handling input and output, and controlling peripheral devices. It provides a platform for application software to run on.</p>
+
+            <h3>1.2 Objectives of Operating System</h3>
+            <p>The primary objectives of an operating system are:</p>
+            <ul>
+                <li><strong>Convenience:</strong> Make the computer system convenient and easy to use for users</li>
+                <li><strong>Efficiency:</strong> Utilize computer hardware in an efficient manner to maximize throughput and minimize response time</li>
+                <li><strong>Ability to Evolve:</strong> Should be capable of evolving to accommodate new functionalities without disrupting existing services</li>
+                <li><strong>Resource Management:</strong> Efficiently manage and allocate system resources among various users and processes</li>
+                <li><strong>Reliability:</strong> Ensure the system operates correctly and consistently without errors</li>
+                <li><strong>Security:</strong> Protect data and resources from unauthorized access</li>
+            </ul>
+
+            <h3>1.3 Role of OS as a Resource Manager</h3>
+            <p>The operating system acts as a resource manager by controlling and coordinating the use of hardware resources among various application programs for various users. Key aspects include:</p>
+            <ul>
+                <li><strong>CPU Management:</strong> Allocates CPU time to different processes using scheduling algorithms</li>
+                <li><strong>Memory Management:</strong> Manages primary memory by keeping track of which parts are in use and which are free</li>
+                <li><strong>I/O Device Management:</strong> Controls and coordinates the use of input/output devices</li>
+                <li><strong>File Management:</strong> Manages files on various storage devices and ensures efficient file access</li>
+                <li><strong>Network Management:</strong> Manages network connections and data transfer</li>
+            </ul>
+            <p>The OS ensures that all resources are used efficiently and no resource remains idle while processes are waiting for them. It also ensures fair distribution of resources among competing processes.</p>
+        </section>
+
+        <section id="functions">
+            <h2>2. Functions of Operating System</h2>
+            
+            <h3>2.1 Process Management</h3>
+            <p>Process management involves the creation, scheduling, and termination of processes. Key responsibilities include:</p>
+            <ul>
+                <li>Creating and deleting both user and system processes</li>
+                <li>Suspending and resuming processes</li>
+                <li>Providing mechanisms for process synchronization</li>
+                <li>Providing mechanisms for process communication</li>
+                <li>Handling deadlock situations</li>
+                <li>CPU scheduling to maximize CPU utilization</li>
+            </ul>
+
+            <h3>2.2 Memory Management</h3>
+            <p>Memory management is responsible for managing the primary memory of the computer system. Functions include:</p>
+            <ul>
+                <li>Keeping track of which parts of memory are currently being used and by which process</li>
+                <li>Deciding which processes and data to move in and out of memory</li>
+                <li>Allocating and deallocating memory space as needed</li>
+                <li>Managing virtual memory using paging and segmentation techniques</li>
+                <li>Protecting memory areas from unauthorized access</li>
+            </ul>
+
+            <h3>2.3 File Management</h3>
+            <p>The operating system manages files and directories on secondary storage devices. Functions include:</p>
+            <ul>
+                <li>Creating and deleting files and directories</li>
+                <li>Providing primitives for manipulating files and directories</li>
+                <li>Mapping files onto secondary storage</li>
+                <li>Backing up files on stable storage media</li>
+                <li>Managing file permissions and access control</li>
+            </ul>
+
+            <h3>2.4 I/O Management</h3>
+            <p>I/O management handles all input and output operations. Functions include:</p>
+            <ul>
+                <li>Managing I/O device drivers</li>
+                <li>Buffering, caching, and spooling of I/O operations</li>
+                <li>Providing a general device-driver interface</li>
+                <li>Handling interrupts from I/O devices</li>
+                <li>Ensuring efficient I/O operations</li>
+            </ul>
+
+            <h3>2.5 Secondary Storage Management</h3>
+            <p>Secondary storage management involves managing disk drives and other secondary storage devices:</p>
+            <ul>
+                <li>Free space management on storage devices</li>
+                <li>Storage allocation for files</li>
+                <li>Disk scheduling to optimize access time</li>
+                <li>Managing disk partitions</li>
+                <li>Ensuring data integrity on storage devices</li>
+            </ul>
+
+            <h3>2.6 Security and Protection</h3>
+            <p>Security and protection mechanisms ensure system integrity and data confidentiality:</p>
+            <ul>
+                <li>User authentication and authorization</li>
+                <li>Protecting system resources from unauthorized access</li>
+                <li>Implementing access control mechanisms</li>
+                <li>Detecting and preventing security threats</li>
+                <li>Maintaining audit trails and logs</li>
+            </ul>
+        </section>
+
+        <section id="types">
+            <h2>3. Types of Operating Systems</h2>
+
+            <h3>3.1 Batch Operating System</h3>
+            <div class="definition">
+                <strong>Batch Operating System:</strong> A type of operating system where similar jobs having similar requirements are batched together and executed as a group to improve system efficiency.
+            </div>
+            <p><strong>Features:</strong></p>
+            <ul>
+                <li>Jobs are collected and processed in batches</li>
+                <li>No direct interaction between user and computer during execution</li>
+                <li>Operator groups jobs with similar needs into batches</li>
+                <li>Reduces setup time and idle CPU time</li>
+                <li>Examples: Payroll systems, bank statement generation</li>
+            </ul>
+
+            <h3>3.2 Multiprogramming Operating System</h3>
+            <div class="definition">
+                <strong>Multiprogramming Operating System:</strong> An operating system that allows multiple programs to reside in main memory simultaneously and the CPU switches between them to maximize CPU utilization.
+            </div>
+            <p><strong>Features:</strong></p>
+            <ul>
+                <li>Multiple programs loaded in memory at the same time</li>
+                <li>CPU switches between programs when one program is waiting for I/O</li>
+                <li>Increases CPU utilization</li>
+                <li>Reduces CPU idle time</li>
+                <li>More complex memory management required</li>
+            </ul>
+
+            <h3>3.3 Multitasking Operating System</h3>
+            <div class="definition">
+                <strong>Multitasking Operating System:</strong> An extension of multiprogramming where the CPU switches between tasks so quickly that users can interact with each program while it is running.
+            </div>
+            <p><strong>Features:</strong></p>
+            <ul>
+                <li>Multiple tasks executed concurrently</li>
+                <li>CPU time is divided among tasks using time-sharing</li>
+                <li>User can interact with multiple applications simultaneously</li>
+                <li>Examples: Windows, Linux, macOS</li>
+                <li>Requires sophisticated scheduling algorithms</li>
+            </ul>
+
+            <h3>3.4 Time-Sharing Operating System</h3>
+            <div class="definition">
+                <strong>Time-Sharing Operating System:</strong> An operating system that allows multiple users to use the computer simultaneously by sharing the CPU time among them in small time slices called time quantum or time slice.
+            </div>
+            <p><strong>Features:</strong></p>
+            <ul>
+                <li>Multiple users can access the system simultaneously</li>
+                <li>CPU time is divided into small time slices</li>
+                <li>Each user gets the impression of having their own computer</li>
+                <li>Fast response time for users</li>
+                <li>Examples: UNIX, Linux systems supporting multiple users</li>
+            </ul>
+
+            <h3>3.5 Real-Time Operating System</h3>
+            <div class="definition">
+                <strong>Real-Time Operating System (RTOS):</strong> An operating system designed to process data and events that have strict time constraints. It must respond to inputs within a guaranteed time period.
+            </div>
+            <p><strong>Types of RTOS:</strong></p>
+            <ul>
+                <li><strong>Hard Real-Time System:</strong> Must meet deadlines strictly. Missing a deadline may cause catastrophic consequences. Examples: Aircraft control systems, medical equipment</li>
+                <li><strong>Soft Real-Time System:</strong> Deadlines are important but not critical. Missing deadlines causes performance degradation. Examples: Multimedia systems, online transaction systems</li>
+            </ul>
+            <p><strong>Features:</strong></p>
+            <ul>
+                <li>Deterministic behavior with guaranteed response time</li>
+                <li>Priority-based scheduling</li>
+                <li>Minimal latency</li>
+                <li>High reliability and stability</li>
+            </ul>
+
+            <h3>3.6 Distributed Operating System</h3>
+            <div class="definition">
+                <strong>Distributed Operating System:</strong> An operating system that manages a collection of independent computers and makes them appear to users as a single coherent system.
+            </div>
+            <p><strong>Features:</strong></p>
+            <ul>
+                <li>Multiple autonomous computers connected via network</li>
+                <li>Resources are shared among different sites</li>
+                <li>Improved reliability through redundancy</li>
+                <li>Better resource sharing and load balancing</li>
+                <li>Examples: Cloud computing platforms, distributed databases</li>
+            </ul>
+        </section>
+
+        <section id="structure">
+            <h2>4. Operating System Structure</h2>
+
+            <h3>4.1 Simple Structure</h3>
+            <p>In simple structure, the operating system is written as a collection of procedures where any procedure can call any other procedure. There is no well-defined structure.</p>
+            <p><strong>Characteristics:</strong></p>
+            <ul>
+                <li>No clear separation between interfaces and levels of functionality</li>
+                <li>All components have direct access to hardware</li>
+                <li>Example: MS-DOS (early versions)</li>
+            </ul>
+            <table>
+                <tr>
+                    <th>Advantages</th>
+                    <th>Disadvantages</th>
+                </tr>
+                <tr>
+                    <td>Simple to implement</td>
+                    <td>Difficult to maintain and debug</td>
+                </tr>
+                <tr>
+                    <td>Fast execution due to minimal overhead</td>
+                    <td>No protection between modules</td>
+                </tr>
+                <tr>
+                    <td>Efficient for small systems</td>
+                    <td>Changes in one part may affect entire system</td>
+                </tr>
+            </table>
+
+            <h3>4.2 Layered Structure</h3>
+            <p>In layered structure, the operating system is divided into a number of layers, each built on top of lower layers. The bottom layer is the hardware and the highest layer is the user interface.</p>
+            <p><strong>Characteristics:</strong></p>
+            <ul>
+                <li>System divided into multiple layers with well-defined interfaces</li>
+                <li>Each layer uses functions and services of only lower layers</li>
+                <li>Layer 0: Hardware</li>
+                <li>Layer N: User interface</li>
+            </ul>
+            <table>
+                <tr>
+                    <th>Advantages</th>
+                    <th>Disadvantages</th>
+                </tr>
+                <tr>
+                    <td>Modularity and easy to debug</td>
+                    <td>Difficult to define layers appropriately</td>
+                </tr>
+                <tr>
+                    <td>Each layer can be tested independently</td>
+                    <td>Less efficient due to overhead of layer transitions</td>
+                </tr>
+                <tr>
+                    <td>Better protection and security</td>
+                    <td>Complex to implement</td>
+                </tr>
+                <tr>
+                    <td>Easy to maintain and modify</td>
+                    <td>Performance may be slower</td>
+                </tr>
+            </table>
+
+            <h3>4.3 Microkernel Structure</h3>
+            <p>In microkernel structure, the kernel is kept as small as possible. Most services run in user space rather than kernel space. The kernel provides only essential functions like inter-process communication and basic scheduling.</p>
+            <p><strong>Characteristics:</strong></p>
+            <ul>
+                <li>Minimal kernel with basic functionalities only</li>
+                <li>Most OS services run as user-level processes</li>
+                <li>Communication between modules using message passing</li>
+                <li>Examples: Mach, QNX, Minix</li>
+            </ul>
+            <table>
+                <tr>
+                    <th>Advantages</th>
+                    <th>Disadvantages</th>
+                </tr>
+                <tr>
+                    <td>Easier to extend and port to new architectures</td>
+                    <td>Performance overhead due to message passing</td>
+                </tr>
+                <tr>
+                    <td>More reliable and secure</td>
+                    <td>Complex to design and implement</td>
+                </tr>
+                <tr>
+                    <td>Failure in one service does not crash entire system</td>
+                    <td>More system calls and context switches</td>
+                </tr>
+                <tr>
+                    <td>Easier to maintain and debug</td>
+                    <td>May be slower than monolithic kernels</td>
+                </tr>
+            </table>
+        </section>
+
+        <section id="modes">
+            <h2>5. User Mode and Kernel Mode</h2>
+
+            <h3>5.1 Definition of User Mode</h3>
+            <div class="definition">
+                <strong>User Mode:</strong> A restricted mode of operation where a process has limited access to system resources and cannot execute privileged instructions. User applications run in this mode.
+            </div>
+            <p><strong>Characteristics of User Mode:</strong></p>
+            <ul>
+                <li>Limited access to hardware and system resources</li>
+                <li>Cannot execute privileged instructions</li>
+                <li>Cannot directly access kernel memory</li>
+                <li>Provides protection and security</li>
+                <li>Most application programs run in user mode</li>
+            </ul>
+
+            <h3>5.2 Definition of Kernel Mode</h3>
+            <div class="definition">
+                <strong>Kernel Mode:</strong> A privileged mode of operation where the executing code has complete and unrestricted access to all hardware resources and can execute any CPU instruction.
+            </div>
+            <p><strong>Characteristics of Kernel Mode:</strong></p>
+            <ul>
+                <li>Full access to all hardware and system resources</li>
+                <li>Can execute all CPU instructions including privileged ones</li>
+                <li>Can access any memory location</li>
+                <li>Operating system kernel runs in this mode</li>
+                <li>Device drivers typically run in kernel mode</li>
+            </ul>
+
+            <h3>5.3 Mode Bit</h3>
+            <p>The mode bit is a bit in the processor status register that indicates the current mode of operation.</p>
+            <ul>
+                <li><strong>Mode Bit = 0:</strong> Indicates Kernel Mode (Supervisor Mode)</li>
+                <li><strong>Mode Bit = 1:</strong> Indicates User Mode</li>
+            </ul>
+            <p>The mode bit is automatically changed by hardware during system calls, interrupts, and exceptions.</p>
+
+            <h3>5.4 Why Dual Mode Operation is Required</h3>
+            <p>Dual mode operation is essential for several critical reasons:</p>
+            <ul>
+                <li><strong>Protection:</strong> Prevents user programs from interfering with the operating system and other programs</li>
+                <li><strong>Security:</strong> Restricts unauthorized access to critical system resources</li>
+                <li><strong>Reliability:</strong> Ensures that errors in user programs do not crash the entire system</li>
+                <li><strong>Resource Management:</strong> Allows the OS to control and manage system resources effectively</li>
+                <li><strong>Isolation:</strong> Provides isolation between different user processes</li>
+                <li><strong>Controlled Access:</strong> Ensures that access to hardware is mediated through the operating system</li>
+            </ul>
+            <p>When a user program requires a privileged operation, it must request the service from the operating system through a system call, which switches the mode from user mode to kernel mode temporarily.</p>
+        </section>
+
+        <section id="system-calls">
+            <h2>6. System Calls</h2>
+
+            <h3>6.1 Definition of System Call</h3>
+            <div class="definition">
+                <strong>System Call:</strong> A system call is a programmatic interface provided by the operating system that allows user-level processes to request services from the kernel. It is the mechanism by which a user program requests services from the operating system.
+            </div>
+
+            <h3>6.2 Need for System Calls</h3>
+            <p>System calls are necessary for the following reasons:</p>
+            <ul>
+                <li><strong>Access to Privileged Operations:</strong> User programs cannot directly access hardware or perform privileged operations</li>
+                <li><strong>Security:</strong> Provides a controlled interface for accessing system resources</li>
+                <li><strong>Abstraction:</strong> Hides hardware complexity from application programmers</li>
+                <li><strong>Portability:</strong> Provides a standard interface across different hardware platforms</li>
+                <li><strong>Resource Management:</strong> Allows OS to manage and allocate resources efficiently</li>
+            </ul>
+
+            <h3>6.3 Types of System Calls</h3>
+
+            <h4>6.3.1 Process Control System Calls</h4>
+            <p>These system calls are used for process management:</p>
+            <ul>
+                <li><strong>Create Process:</strong> Create a new process</li>
+                <li><strong>Terminate Process:</strong> End a process execution</li>
+                <li><strong>Load and Execute:</strong> Load a program into memory and execute it</li>
+                <li><strong>Get/Set Process Attributes:</strong> Retrieve or modify process attributes</li>
+                <li><strong>Wait for Time/Event:</strong> Suspend process until specified time or event occurs</li>
+                <li><strong>Signal Event:</strong> Signal the occurrence of an event</li>
+            </ul>
+
+            <h4>6.3.2 File Management System Calls</h4>
+            <p>These system calls handle file operations:</p>
+            <ul>
+                <li><strong>Create File:</strong> Create a new file</li>
+                <li><strong>Delete File:</strong> Remove an existing file</li>
+                <li><strong>Open File:</strong> Open a file for reading or writing</li>
+                <li><strong>Close File:</strong> Close an open file</li>
+                <li><strong>Read File:</strong> Read data from a file</li>
+                <li><strong>Write File:</strong> Write data to a file</li>
+                <li><strong>Get/Set File Attributes:</strong> Retrieve or modify file attributes</li>
+            </ul>
+
+            <h4>6.3.3 Device Management System Calls</h4>
+            <p>These system calls manage I/O devices:</p>
+            <ul>
+                <li><strong>Request Device:</strong> Request access to a device</li>
+                <li><strong>Release Device:</strong> Release a previously acquired device</li>
+                <li><strong>Read from Device:</strong> Read data from a device</li>
+                <li><strong>Write to Device:</strong> Write data to a device</li>
+                <li><strong>Get/Set Device Attributes:</strong> Retrieve or modify device parameters</li>
+            </ul>
+
+            <h4>6.3.4 Information Maintenance System Calls</h4>
+            <p>These system calls transfer information between user programs and the operating system:</p>
+            <ul>
+                <li><strong>Get Time/Date:</strong> Retrieve current system time and date</li>
+                <li><strong>Set Time/Date:</strong> Set system time and date</li>
+                <li><strong>Get System Data:</strong> Retrieve system information</li>
+                <li><strong>Set System Data:</strong> Modify system parameters</li>
+                <li><strong>Get Process Attributes:</strong> Retrieve information about processes</li>
+            </ul>
+
+            <h4>6.3.5 Communication System Calls</h4>
+            <p>These system calls facilitate inter-process communication:</p>
+            <ul>
+                <li><strong>Create Connection:</strong> Establish a communication connection</li>
+                <li><strong>Delete Connection:</strong> Terminate a communication connection</li>
+                <li><strong>Send Message:</strong> Send data to another process</li>
+                <li><strong>Receive Message:</strong> Receive data from another process</li>
+                <li><strong>Transfer Status Information:</strong> Exchange status information between processes</li>
+            </ul>
+
+            <h3>6.4 Examples of System Calls (Conceptual)</h3>
+            <p>Common conceptual examples of system calls include:</p>
+            <ul>
+                <li><span class="highlight">fork()</span> - Creates a new process</li>
+                <li><span class="highlight">exec()</span> - Executes a program</li>
+                <li><span class="highlight">exit()</span> - Terminates a process</li>
+                <li><span class="highlight">wait()</span> - Waits for a child process to terminate</li>
+                <li><span class="highlight">open()</span> - Opens a file</li>
+                <li><span class="highlight">read()</span> - Reads from a file or device</li>
+                <li><span class="highlight">write()</span> - Writes to a file or device</li>
+                <li><span class="highlight">close()</span> - Closes a file descriptor</li>
+            </ul>
+        </section>
+
+        <section id="services">
+            <h2>7. Operating System Services</h2>
+            <p>Operating systems provide various services to users and programs. These services can be categorized as follows:</p>
+
+            <h3>7.1 Program Execution</h3>
+            <p>The operating system must be able to load a program into memory and run it. Services include:</p>
+            <ul>
+                <li>Loading programs into memory</li>
+                <li>Executing programs</li>
+                <li>Providing environment for program execution</li>
+                <li>Terminating program execution normally or abnormally</li>
+            </ul>
+
+            <h3>7.2 I/O Operations</h3>
+            <p>Programs may require input/output operations involving files or I/O devices:</p>
+            <ul>
+                <li>Providing interface for I/O devices</li>
+                <li>Managing I/O operations efficiently</li>
+                <li>Handling device-specific requirements</li>
+                <li>Buffering and caching I/O data</li>
+            </ul>
+
+            <h3>7.3 File System Manipulation</h3>
+            <p>Programs need to perform operations on files and directories:</p>
+            <ul>
+                <li>Creating, reading, writing, and deleting files</li>
+                <li>Creating and deleting directories</li>
+                <li>Searching for files</li>
+                <li>Managing file permissions</li>
+                <li>Organizing files in directory structures</li>
+            </ul>
+
+            <h3>7.4 Communication</h3>
+            <p>Processes need to exchange information with each other:</p>
+            <ul>
+                <li>Inter-process communication mechanisms</li>
+                <li>Message passing between processes</li>
+                <li>Shared memory communication</li>
+                <li>Network communication support</li>
+            </ul>
+
+            <h3>7.5 Error Detection</h3>
+            <p>The operating system must constantly monitor for possible errors:</p>
+            <ul>
+                <li>Detecting hardware errors (CPU, memory, I/O devices)</li>
+                <li>Detecting software errors (divide by zero, invalid memory access)</li>
+                <li>Taking appropriate actions to ensure correct computing</li>
+                <li>Logging errors for debugging and analysis</li>
+            </ul>
+
+            <h3>7.6 Resource Allocation</h3>
+            <p>When multiple users or jobs are running concurrently, resources must be allocated efficiently:</p>
+            <ul>
+                <li>Allocating CPU time through scheduling</li>
+                <li>Allocating memory to processes</li>
+                <li>Allocating I/O devices to processes</li>
+                <li>Managing storage space allocation</li>
+            </ul>
+
+            <h3>7.7 Accounting</h3>
+            <p>The operating system keeps track of resource usage:</p>
+            <ul>
+                <li>Tracking which users use how much and what kinds of resources</li>
+                <li>Recording usage statistics</li>
+                <li>Billing users for resource consumption</li>
+                <li>Performance monitoring and analysis</li>
+            </ul>
+
+            <h3>7.8 Protection and Security</h3>
+            <p>Ensuring system integrity and data confidentiality:</p>
+            <ul>
+                <li><strong>Protection:</strong> Controlling access of processes or users to system resources</li>
+                <li><strong>Security:</strong> Defending the system from external and internal attacks</li>
+                <li>User authentication and authorization</li>
+                <li>Access control mechanisms</li>
+                <li>Encryption and data protection</li>
+            </ul>
+        </section>
+
+        <section id="booting">
+            <h2>8. Booting of Operating System</h2>
+
+            <h3>8.1 Definition of Booting</h3>
+            <div class="definition">
+                <strong>Booting:</strong> Booting is the process of starting up a computer and loading the operating system into the main memory. It is the initialization sequence that prepares the computer system for use.
+            </div>
+
+            <h3>8.2 Types of Booting</h3>
+
+            <h4>8.2.1 Cold Booting</h4>
+            <div class="definition">
+                <strong>Cold Booting:</strong> Cold booting refers to starting a computer from a completely powered-off state. It involves switching on the power supply of the computer.
+            </div>
+            <p><strong>Characteristics:</strong></p>
+            <ul>
+                <li>Computer is started from a completely powered-off state</li>
+                <li>All hardware components are initialized</li>
+                <li>Power-On Self-Test (POST) is performed</li>
+                <li>Takes longer time compared to warm booting</li>
+                <li>More thorough system initialization</li>
+            </ul>
+
+            <h4>8.2.2 Warm Booting</h4>
+            <div class="definition">
+                <strong>Warm Booting:</strong> Warm booting (also called soft booting or restart) refers to restarting a computer without turning off the power. It is done using the restart option or key combinations.
+            </div>
+            <p><strong>Characteristics:</strong></p>
+            <ul>
+                <li>Computer is restarted without powering off</li>
+                <li>Hardware is already initialized</li>
+                <li>POST may be skipped or shortened</li>
+                <li>Faster than cold booting</li>
+                <li>Used to refresh the system or apply updates</li>
+            </ul>
+
+            <h3>8.3 Basic Steps in Booting Process</h3>
+            <p>The booting process typically involves the following steps:</p>
+            <ol>
+                <li><strong>Power On:</strong> When the computer is powered on, the CPU is initialized and begins executing instructions from ROM</li>
+                <li><strong>POST (Power-On Self-Test):</strong> The BIOS performs a series of diagnostic tests to check if the hardware components are functioning properly. It checks RAM, keyboard, disk drives, and other peripherals</li>
+                <li><strong>BIOS Execution:</strong> The Basic Input/Output System (BIOS) is loaded from ROM. BIOS provides low-level access to hardware and contains the boot sequence</li>
+                <li><strong>Boot Device Selection:</strong> BIOS searches for a bootable device according to the boot sequence defined in BIOS settings. Common boot devices include hard disk, CD/DVD, USB drive, or network</li>
+                <li><strong>MBR Loading:</strong> BIOS loads the Master Boot Record (MBR) from the boot device into memory. MBR is the first sector of the bootable disk and contains the boot loader</li>
+                <li><strong>Boot Loader Execution:</strong> The boot loader program is executed. It locates the operating system kernel on the disk. Common boot loaders include GRUB, LILO, and Windows Boot Manager</li>
+                <li><strong>Kernel Loading:</strong> The boot loader loads the operating system kernel into memory and transfers control to it</li>
+                <li><strong>Kernel Initialization:</strong> The kernel initializes device drivers, mounts the root file system, and prepares the system for operation</li>
+                <li><strong>Init Process:</strong> The kernel starts the init process, which is the first user-space process. It has process ID 1</li>
+                <li><strong>System Services:</strong> The init process starts system services and daemons according to the run level or target</li>
+                <li><strong>User Login:</strong> Finally, the system presents a login screen or desktop environment for user interaction</li>
+            </ol>
+        </section>
+
+        <section id="exam-focus">
+            <div class="exam-focus">
+                <h2>9. Exam Focus Box</h2>
+
+                <h3>9.1 Important Definitions to Memorize</h3>
+                <ul>
+                    <li><strong>Operating System:</strong> System software that acts as intermediary between hardware and user</li>
+                    <li><strong>Multiprogramming:</strong> Multiple programs in memory simultaneously with CPU switching</li>
+                    <li><strong>System Call:</strong> Programmatic interface for user programs to request OS services</li>
+                    <li><strong>Kernel Mode:</strong> Privileged mode with full hardware access</li>
+                    <li><strong>User Mode:</strong> Restricted mode with limited access to resources</li>
+                    <li><strong>Booting:</strong> Process of starting computer and loading OS into memory</li>
+                    <li><strong>RTOS:</strong> OS designed to process data with strict time constraints</li>
+                </ul>
+
+                <h3>9.2 Frequently Asked AKTU Questions from Unit 1</h3>
+                <ul>
+                    <li>Define operating system and explain its functions</li>
+                    <li>Differentiate between multiprogramming and multitasking operating systems</li>
+                    <li>Explain different types of operating systems with examples</li>
+                    <li>What is the need for dual mode operation? Explain user mode and kernel mode</li>
+                    <li>Define system calls and explain different types of system calls</li>
+                    <li>Explain the layered structure of operating system with advantages and disadvantages</li>
+                    <li>Compare microkernel structure with layered structure</li>
+                    <li>What are the services provided by operating system?</li>
+                    <li>Explain the booting process of an operating system</li>
+                    <li>Differentiate between cold booting and warm booting</li>
+                    <li>Explain the role of OS as a resource manager</li>
+                    <li>What is real-time operating system? Differentiate between hard and soft real-time systems</li>
+                </ul>
+
+                <h3>9.3 Keywords to Use in Answers</h3>
+                <p>Always include these keywords in your answers to score maximum marks:</p>
+                <ul>
+                    <li>Resource Management</li>
+                    <li>Process Scheduling</li>
+                    <li>Memory Management</li>
+                    <li>File System</li>
+                    <li>Protection and Security</li>
+                    <li>Privileged Instructions</li>
+                    <li>Mode Bit</li>
+                    <li>Kernel Space / User Space</li>
+                    <li>System Call Interface</li>
+                    <li>CPU Utilization</li>
+                    <li>Context Switching</li>
+                    <li>Inter-Process Communication</li>
+                </ul>
+
+                <h3>9.4 Common Mistakes Students Make</h3>
+                <ul>
+                    <li><strong>Mistake:</strong> Confusing multiprogramming with multitasking<br>
+                        <strong>Correction:</strong> Multiprogramming is multiple programs in memory; multitasking extends this with rapid CPU switching for user interaction</li>
+                    <li><strong>Mistake:</strong> Not differentiating between user mode and kernel mode clearly<br>
+                        <strong>Correction:</strong> Always mention mode bit, privilege levels, and access restrictions</li>
+                    <li><strong>Mistake:</strong> Writing vague definitions without proper structure<br>
+                        <strong>Correction:</strong> Always start with a clear definition, then explain features/characteristics</li>
+                    <li><strong>Mistake:</strong> Forgetting to mention examples when discussing OS types<br>
+                        <strong>Correction:</strong> Always provide real-world examples for each type of OS</li>
+                    <li><strong>Mistake:</strong> Not explaining the need or importance of concepts<br>
+                        <strong>Correction:</strong> Always explain why a concept is important (e.g., why dual mode operation is needed)</li>
+                    <li><strong>Mistake:</strong> Mixing up functions and services of OS<br>
+                        <strong>Correction:</strong> Functions are what OS does internally; services are what OS provides to users/programs</li>
+                </ul>
+
+                <h3>9.5 Answer Writing Tips</h3>
+                <ul>
+                    <li>Always start answers with a clear definition</li>
+                    <li>Use diagrams where possible (mode bit transitions, layered structure)</li>
+                    <li>Structure long answers with headings and subheadings</li>
+                    <li>Provide examples to support theoretical concepts</li>
+                    <li>For comparison questions, use tables to show differences clearly</li>
+                    <li>Always conclude with advantages/disadvantages if asked</li>
+                    <li>Use technical terminology correctly</li>
+                    <li>Write in clear, concise language avoiding unnecessary elaboration</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Prepared for AKTU B.Tech CSE – Operating System Unit 1</p>
+    </footer>
+
+    <script>
+        window.onbeforeprint = function () {
+            alert("Printing is disabled. Please view the content on aktunotes.live");
+        };
+
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                alert("Printing is disabled. Please view the content on aktunotes.live");
+            }
+        });
+
+        document.addEventListener('contextmenu', function(e) {
+            var target = e.target;
+            if (target.tagName === 'IMG' || target.closest('section')) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
+```
